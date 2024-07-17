@@ -1,6 +1,6 @@
-from .db import get_db
+from app.database.db import get_db
 from sqlalchemy.orm import Session
-from . import models
+from app.database import models
 
 
 def get_user_by_email(db: Session, email: str):

@@ -1,11 +1,11 @@
-from .. import models
-from .. import schemas
+from app.database import models
+from app.schemas import schemas
 
 from fastapi import APIRouter, Depends, HTTPException
-from ..db import get_db
+from app.database.db import get_db
 from sqlalchemy.orm import Session
-from .. import auth
-from .. import crud
+from app.security import auth
+from app.database import crud
 
 
 router = APIRouter()
