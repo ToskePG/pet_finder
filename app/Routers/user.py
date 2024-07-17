@@ -31,7 +31,7 @@ async def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db.refresh(db_user)
     return db_user
 
-@router.post('/users/', response_model=list[schemas.User])
+@router.get('/users/', response_model=list[schemas.User])
 async def read_users(skip: int=0, limit: int=0, db: Session = Depends(get_db)):
     users = crud.get_users(db=db, skip=skip, limit=limit)
     return users
