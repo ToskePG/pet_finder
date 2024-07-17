@@ -1,5 +1,3 @@
-Here's a comprehensive README file tailored to your `PET_FINDER` project based on the provided structure:
-
 ---
 
 # PET_FINDER
