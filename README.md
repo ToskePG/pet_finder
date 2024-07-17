@@ -1,3 +1,5 @@
+This is a readme file for easier usage and understanding of the pet_finder project.
+
 ---
 
 # PET_FINDER
