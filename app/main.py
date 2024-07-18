@@ -18,6 +18,6 @@ async def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 # Mount static files if you have any
-#app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/app/static", StaticFiles(directory="app/static"), name="static")
 
 app.include_router(user.router)

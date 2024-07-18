@@ -4,13 +4,47 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Welcome to Pet Finder</title>
+    <style>
+      body,
+      html {
+        height: 100%;
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      .bg {
+        background-image: url("/app/static/images/background.jpg");
+        height: 100%;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        text-align: center;
+        color: white;
+      }
+      .button {
+        background-color: #4caf50;
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 12px;
+      }
+    </style>
   </head>
   <body>
-    <h1>Welcome to Pet Finder</h1>
-    <p>Find your lost pets or help others find theirs.</p>
-    <button onclick="location.href='/docs'" type="button">Documentation</button>
-    <button onclick="location.href='/your-other-link'" type="button">
-      Your Other Link
-    </button>
+    <div class="bg">
+      <h1>Welcome to the Pet Finder App</h1>
+      <button class="button" onclick="location.href='/docs'">
+        Documentation
+      </button>
+    </div>
   </body>
 </html>
