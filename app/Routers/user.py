@@ -46,6 +46,12 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
+#Here im trying to verify the currently logged in user using JWT token
+@router.get('/me', response_model=schemas.User)
+async def get_me(current_user: schemas.User = Depends(auth.get_current_user)):
+    return current_user
+
+#List all users, its more for testing the registration endpoint, but maybe it will still be needed
 @router.get('/users/', response_model=list[schemas.User])
 async def read_users(skip: int=0, limit: int=0, db: Session = Depends(get_db)):
     users = crud.get_users(db=db, skip=skip, limit=limit)
