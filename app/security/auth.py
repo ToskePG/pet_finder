@@ -5,9 +5,9 @@ from typing import Union, Optional
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
-from app.database import crud
-from app.schemas import schemas
-from app.database.db import get_db
+from ..database import crud
+from ..schemas import schemas
+from ..database.db import get_db
 
 #Configuration for JWT
 SECRET_KEY = "#9$Pv6Zr!w@Nq4A^yT7*Jd"
@@ -58,3 +58,9 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
     if user is None:
         raise credentials_exception
     return user
+
+#Verification if user is admin
+async def get_current_admin_user(current_user: schemas.User = Depends(get_current_user)):
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+    return current_user
