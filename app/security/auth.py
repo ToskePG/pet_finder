@@ -12,7 +12,7 @@ from app.database.db import get_db
 #Configuration for JWT
 SECRET_KEY = "#9$Pv6Zr!w@Nq4A^yT7*Jd"
 ALGORITHM = "HS256"
-ACCES_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 #Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
