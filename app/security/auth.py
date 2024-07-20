@@ -7,6 +7,7 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from app.database import crud
 from app.schemas import schemas
+from app.database.db import get_db
 
 #Configuration for JWT
 SECRET_KEY = "#9$Pv6Zr!w@Nq4A^yT7*Jd"
