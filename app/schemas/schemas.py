@@ -88,3 +88,12 @@ class Post(PostBase):
 
     class Config:
         orm_mode = True
+
+
+#Token
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    username: Optional[str] = None

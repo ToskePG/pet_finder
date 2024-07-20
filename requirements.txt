@@ -4,3 +4,4 @@ passlib
 bcrypt
 alembic
 jinja2
+pyjwt
