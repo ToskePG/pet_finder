@@ -69,8 +69,8 @@ async def get_posts(db: AsyncSession, skip: int = 0, limit: int = 10) -> list[mo
     result = await db.execute(select(models.Post).offset(skip).limit(limit))
     return result.scalars().all()
 
-# Update a post
-async def update_post(db: AsyncSession, post_id: int, post: schemas.CreatePost) -> models.Post:
+#Update a post
+async def update_post(db: AsyncSession, post_id: int, post: schemas.CreatePost) -> Optional[models.Post]:
     result = await db.execute(select(models.Post).where(models.Post.post_id == post_id))
     db_post = result.scalar_one_or_none()
     if db_post is None:
@@ -81,8 +81,8 @@ async def update_post(db: AsyncSession, post_id: int, post: schemas.CreatePost) 
     await db.refresh(db_post)
     return db_post
 
-# Delete a post
-async def delete_post(db: AsyncSession, post_id: int) -> models.Post:
+#Delete a post 
+async def delete_post(db: AsyncSession, post_id: int) -> Optional[models.Post]:
     result = await db.execute(select(models.Post).where(models.Post.post_id == post_id))
     db_post = result.scalar_one_or_none()
     if db_post is None:

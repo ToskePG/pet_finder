@@ -21,3 +21,5 @@ async def read_root(request: Request):
 app.mount("/app/static", StaticFiles(directory="app/static"), name="static")
 
 app.include_router(user.router)
+app.include_router(animal.router)
+app.include_router(post.router)
