@@ -1,11 +1,11 @@
-from app.database import models
-from app.schemas import schemas
+from ..database import models
+from ..schemas import schemas
 from fastapi.security import OAuth2PasswordRequestForm
-from fastapi import APIRouter, Depends, HTTPException
-from app.database.db import get_db
+from fastapi import APIRouter, Depends, HTTPException, status
+from ..database.db import get_db
 from sqlalchemy.orm import Session
-from app.security import auth
-from app.database import crud
+from ..security import auth
+from ..database import crud
 from datetime import timedelta
 
 
@@ -57,3 +57,12 @@ async def get_me(current_user: schemas.User = Depends(auth.get_current_user)):
 async def read_users(skip: int=0, limit: int=0, db: Session = Depends(get_db)):
     users = crud.get_users(db=db, skip=skip, limit=limit)
     return users
+
+@router.delete('/users/{user_id}/', status_code=status.HTTP_204_NO_CONTENT)
+async def delete_user(user_id: int, current_user: schemas.User = Depends(auth.get_current_admin_user), db: Session = Depends(get_db)):
+    
+    db_user = crud.delete_user(user_id=user_id, db=db)
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return 
+
