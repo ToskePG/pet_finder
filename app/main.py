@@ -1,4 +1,4 @@
-from .Routers import user
+from .Routers import user, animal, post
 from app.database.db import Base, engine
 from fastapi import FastAPI
 from .database import models
@@ -20,6 +20,6 @@ async def read_root(request: Request):
 # Mount static files if you have any
 app.mount("/app/static", StaticFiles(directory="app/static"), name="static")
 
-app.include_router(user.router)
-app.include_router(animal.router)
-app.include_router(post.router)
+app.include_router(user.router, prefix="/api/users")
+app.include_router(animal.router, prefix="/api/animals")
+app.include_router(post.router, prefix="/api/posts")
