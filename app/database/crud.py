@@ -4,7 +4,8 @@ from ..database import models
 from ..schemas import schemas
 from typing import Optional
 from sqlalchemy import and_
-
+from ..database.models import Post
+from ..schemas.schemas import CreatePost, PostBase
 
 def get_user_by_email(db: Session, email: str):
     return db.query(models.User).filter(models.User.email == email).first()
@@ -45,4 +46,10 @@ def get_animals(animal_type: Optional[str], animal_breed: Optional[str], db: Ses
     
     return db.query(models.Animal)
 
-
+# Create a new post
+async def create_post(db: Session, post: CreatePost) -> Post:
+    db_post = Post(**post.dict())
+    db.add(db_post)
+    await db.commit()
+    await db.refresh(db_post)
+    return db_post
