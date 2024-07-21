@@ -23,7 +23,7 @@ app.mount("/app/static", StaticFiles(directory="app/static"), name="static")
 #Loads favicon, hate that 404 error lol
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
-    return RedirectResponse(url='/static/favicon.png')
+    return RedirectResponse(url='app/static/favicon.png')
 
 app.include_router(user.router, prefix="/api/users")
 app.include_router(animal.router, prefix="/api/animals")
