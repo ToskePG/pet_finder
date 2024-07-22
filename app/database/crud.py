@@ -5,7 +5,6 @@ from ..schemas import schemas
 from typing import Optional
 from sqlalchemy import and_
 
-
 def get_user_by_email(db: Session, email: str):
     return db.query(models.User).filter(models.User.email == email).first()
 
@@ -45,4 +44,49 @@ def get_animals(animal_type: Optional[str], animal_breed: Optional[str], db: Ses
     
     return db.query(models.Animal)
 
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from sqlalchemy.orm import selectinload
+from sqlalchemy import update, delete
+from ..database import models
+from ..schemas import schemas
 
+# Create a new post
+async def create_post(db: AsyncSession, post: schemas.CreatePost) -> models.Post:
+    db_post = models.Post(**post.dict())
+    db.add(db_post)
+    await db.commit()
+    await db.refresh(db_post)
+    return db_post
+
+# Get a post by ID
+async def get_post(db: AsyncSession, post_id: int) -> models.Post:
+    result = await db.execute(select(models.Post).where(models.Post.post_id == post_id))
+    return result.scalar_one_or_none()
+
+# Get all posts with optional pagination
+async def get_posts(db: AsyncSession, skip: int = 0, limit: int = 10) -> list[models.Post]:
+    result = await db.execute(select(models.Post).offset(skip).limit(limit))
+    return result.scalars().all()
+
+#Update a post
+async def update_post(db: AsyncSession, post_id: int, post: schemas.CreatePost) -> Optional[models.Post]:
+    result = await db.execute(select(models.Post).where(models.Post.post_id == post_id))
+    db_post = result.scalar_one_or_none()
+    if db_post is None:
+        return None
+    for key, value in post.dict().items():
+        setattr(db_post, key, value)
+    await db.commit()
+    await db.refresh(db_post)
+    return db_post
+
+#Delete a post 
+async def delete_post(db: AsyncSession, post_id: int) -> Optional[models.Post]:
+    result = await db.execute(select(models.Post).where(models.Post.post_id == post_id))
+    db_post = result.scalar_one_or_none()
+    if db_post is None:
+        return None
+    await db.delete(db_post)
+    await db.commit()
+    return db_post
