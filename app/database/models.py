@@ -51,7 +51,7 @@ class Request(Base):
 class PostType(Base):
     __tablename__ = "post_types"
 
-    post_type_id = Column(Ineteger, primary_key=True)
+    post_type_id = Column(Integer, primary_key=True)
     post_type_name = Column(String, unique=True)
 
 class Post(Base):
