@@ -107,6 +107,34 @@ async def delete_post(db: AsyncSession, post_id: int) -> Optional[models.Post]:
     await db.commit()
     return db_post
 
+async def get_posts_by_user(db: AsyncSession, user_id: int, skip: int = 0, limit: int = 10) -> list[models.Post]:
+    result = await db.execute(
+        select(models.Post)
+        .where(models.Post.user_id == user_id)
+        .offset(skip)
+        .limit(limit)
+    )
+    return result.scalars().all()
+
+async def get_user_by_username(db: AsyncSession, username: str) -> Optional[models.User]:
+    result = await db.execute(
+        select(models.User).where(models.User.username == username)
+    )
+    return result.scalar_one_or_none()
+
+async def get_posts_by_username(db: AsyncSession, username: str, skip: int = 0, limit: int = 10) -> list[models.Post]:
+    user = await get_user_by_username(db, username)
+    if not user:
+        return []  # User not found, return an empty list or handle as needed
+
+    result = await db.execute(
+        select(models.Post)
+        .where(models.Post.user_id == user.user_id)
+        .offset(skip)
+        .limit(limit)
+    )
+    return result.scalars().all()
+
 #Request CRUD
 async def create_request(db: AsyncSession, request: Schemas.RequestCreate) -> models.Request
     db_request = models.Request(**request.dict())

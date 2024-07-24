@@ -58,3 +58,28 @@ async def delete_post(post_id: int, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Post not found")
     await crud.delete_post(db, post_id)
     return db_post
+
+# List all posts by the current user
+@router.get("/posts/user", response_model=List[schemas.PostResponse])
+async def get_posts_by_user(
+    skip: int = 0,
+    limit: int = 10,
+    current_user: schemas.User = Depends(auth.get_current_user),  # Ensure user is authenticated
+    db: AsyncSession = Depends(get_db)
+):
+    user_id = current_user.user_id
+    posts = await crud.get_posts_by_user(db, user_id, skip, limit)
+    return posts
+
+# List all posts by a specific username
+@router.get("/posts/user/{username}", response_model=List[schemas.PostResponse])
+async def get_posts_by_username(
+    username: str,
+    skip: int = 0,
+    limit: int = 10,
+    db: AsyncSession = Depends(get_db)
+):
+    posts = await crud.get_posts_by_username(db, username, skip, limit)
+    if not posts:
+        raise HTTPException(status_code=404, detail="Posts not found for the given username")
+    return posts
