@@ -60,7 +60,7 @@ async def delete_post(post_id: int, db: AsyncSession = Depends(get_db)):
     return db_post
 
 # List all posts by the current user
-@router.get("/posts/user", response_model=List[schemas.PostResponse])
+@router.get("/posts/user", response_model=list[schemas.PostResponse])
 async def get_posts_by_user(
     skip: int = 0,
     limit: int = 10,
@@ -72,7 +72,7 @@ async def get_posts_by_user(
     return posts
 
 # List all posts by a specific username
-@router.get("/posts/user/{username}", response_model=List[schemas.PostResponse])
+@router.get("/posts/user/{username}", response_model=list[schemas.PostResponse])
 async def get_posts_by_username(
     username: str,
     skip: int = 0,

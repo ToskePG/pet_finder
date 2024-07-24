@@ -13,7 +13,12 @@ class UserBase(BaseModel):
     
 class UserCreate(UserBase):
     password: str
-    
+
+class UserResponse(UserBase):
+    username: str
+    email: str
+    is_admin: bool
+
 class User(UserBase):
     class Config:
         orm_mode = True
@@ -54,25 +59,6 @@ class AnimalType(AnimalTypeBase):
     class Config:
         orm_mode = True
 
-# Request Schemas
-class RequestBase(BaseModel):
-    user_id: int
-    post_id: int
-    content: str
-
-class RequestCreate(RequestBase):
-    pass
-
-class RequestResponse(RequestBase)
-    request_id: int
-    user: UserResponse
-    post: PostResponse
-    content: str
-
-class Request(RequestBase):
-    class Config:
-        orm_mode = True
-
 # PostType Schemas
 class PostTypeBase(BaseModel):
     post_type_name: str
@@ -85,8 +71,6 @@ class PostType(PostTypeBase):
 
     class Config:
         orm_mode = True
-
-# New Schemas
 
 # PostTypeResponse Schema
 class PostTypeResponse(BaseModel):
@@ -127,6 +111,25 @@ class PostResponse(BaseModel):
     post_type: PostTypeResponse  # Including the post type details
     created_at: datetime
 
+    class Config:
+        orm_mode = True
+
+# Request Schemas
+class RequestBase(BaseModel):
+    user_id: int
+    post_id: int
+    content: str
+
+class RequestCreate(RequestBase):
+    pass
+
+class RequestResponse(RequestBase):
+    request_id: int
+    user: UserResponse
+    post: PostResponse
+    content: str
+
+class Request(RequestBase):
     class Config:
         orm_mode = True
 
