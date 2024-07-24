@@ -184,3 +184,15 @@ async def get_requests_by_user(db: AsyncSession, user_id: int, skip: int = 0, li
         .limit(limit)
     )
     return result.scalars().all()
+
+# Get posts by user_id
+async def get_posts_by_user_id(db: AsyncSession, user_id: int) -> list[models.Post]:
+    result = await db.execute(select(models.Post).where(models.Post.user_id == user_id))
+    return result.scalars().all()
+
+# Get posts by email
+async def get_posts_by_email(db: AsyncSession, email: str) -> list[models.Post]:
+    result = await db.execute(
+        select(models.Post).join(models.User).where(models.User.email == email)
+    )
+    return result.scalars().all()

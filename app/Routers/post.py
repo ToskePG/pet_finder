@@ -83,3 +83,19 @@ async def get_posts_by_username(
     if not posts:
         raise HTTPException(status_code=404, detail="Posts not found for the given username")
     return posts
+
+# Endpoint to filter posts by user_id
+@router.get("/posts/by_user_id", response_model=list[schemas.PostResponse])
+async def get_posts_by_user_id(user_id: int, db: AsyncSession = Depends(get_db)):
+    posts = await crud.get_posts_by_user_id(db, user_id)
+    if not posts:
+        raise HTTPException(status_code=404, detail="No posts found for the given user ID")
+    return posts
+
+# Endpoint to filter posts by email
+@router.get("/posts/by_email", response_model=list[schemas.PostResponse])
+async def get_posts_by_email(email: str, db: AsyncSession = Depends(get_db)):
+    posts = await crud.get_posts_by_email(db, email)
+    if not posts:
+        raise HTTPException(status_code=404, detail="No posts found for the given email")
+    return posts
