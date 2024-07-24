@@ -7,43 +7,54 @@ from ..security import auth
 
 router = APIRouter()
 
-# Create a new post
-@router.post("/posts", response_model=schemas.Post)
+# PostType Endpoints
+
+@router.post("/post_types", response_model=schemas.PostTypeResponse)
+async def create_post_type(post_type: schemas.PostTypeCreate, db: AsyncSession = Depends(get_db)):
+    db_post_type = await crud.create_post_type(db, post_type)
+    return db_post_type
+
+@router.get("/post_types/{post_type_id}", response_model=schemas.PostTypeResponse)
+async def get_post_type(post_type_id: int, db: AsyncSession = Depends(get_db)):
+    db_post_type = await crud.get_post_type(db, post_type_id)
+    if not db_post_type:
+        raise HTTPException(status_code=404, detail="Post type not found")
+    return db_post_type
+
+@router.get("/post_types", response_model=list[schemas.PostTypeResponse])
+async def get_post_types(db: AsyncSession = Depends(get_db)):
+    return await crud.get_post_types(db)
+
+# Existing Post Endpoints
+
+@router.post("/posts", response_model=schemas.PostResponse)
 async def create_post(post: schemas.CreatePost, current_user: schemas.User = Depends(auth.get_current_user), db: AsyncSession = Depends(get_db)):
-    db_post = await crud.create_post(db, post, user_id=current_user.user_id)
+    db_post = await crud.create_post(db, post)
     return db_post
 
-# Get a post by ID
-@router.get("/posts/id/{post_id}", response_model=schemas.Post)
-async def get_post(post_id: int, current_user: schemas.User = Depends(auth.get_current_user), db: AsyncSession = Depends(get_db)):
+@router.get("/posts/{post_id}", response_model=schemas.PostResponse)
+async def get_post(post_id: int, db: AsyncSession = Depends(get_db)):
     db_post = await crud.get_post(db, post_id)
     if not db_post:
         raise HTTPException(status_code=404, detail="Post not found")
     return db_post
 
-# Get all posts with optional pagination
-@router.get("/posts", response_model=list[schemas.Post])
-async def get_posts(skip: int = 0, limit: int = 10, current_user: schemas.User = Depends(auth.get_current_user), db: AsyncSession = Depends(get_db)):
+@router.get("/posts", response_model=list[schemas.PostResponse])
+async def get_posts(skip: int = 0, limit: int = 10, db: AsyncSession = Depends(get_db)):
     return await crud.get_posts(db, skip=skip, limit=limit)
 
-# Update a post
-@router.put("/posts/{post_id}", response_model=schemas.Post)
-async def update_post(post_id: int, post: schemas.CreatePost, current_user: schemas.User = Depends(auth.get_current_user), db: AsyncSession = Depends(get_db)):
+@router.put("/posts/{post_id}", response_model=schemas.PostResponse)
+async def update_post(post_id: int, post: schemas.CreatePost, db: AsyncSession = Depends(get_db)):
     db_post = await crud.get_post(db, post_id)
     if not db_post:
         raise HTTPException(status_code=404, detail="Post not found")
-    if db_post.user_id != current_user.user_id:
-        raise HTTPException(status_code=403, detail="You are not authorized to update this post")
     db_post = await crud.update_post(db, post_id, post)
     return db_post
 
-# Delete a post
-@router.delete("/posts/{post_id}", response_model=schemas.Post)
-async def delete_post(post_id: int, current_user: schemas.User = Depends(auth.get_current_user), db: AsyncSession = Depends(get_db)):
+@router.delete("/posts/{post_id}", response_model=schemas.PostResponse)
+async def delete_post(post_id: int, db: AsyncSession = Depends(get_db)):
     db_post = await crud.get_post(db, post_id)
     if not db_post:
         raise HTTPException(status_code=404, detail="Post not found")
-    if db_post.user_id != current_user.user_id:
-        raise HTTPException(status_code=403, detail="You are not authorized to delete this post")
     await crud.delete_post(db, post_id)
     return db_post
