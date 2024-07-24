@@ -106,3 +106,81 @@ async def delete_post(db: AsyncSession, post_id: int) -> Optional[models.Post]:
     await db.delete(db_post)
     await db.commit()
     return db_post
+
+async def get_posts_by_user(db: AsyncSession, user_id: int, skip: int = 0, limit: int = 10) -> list[models.Post]:
+    result = await db.execute(
+        select(models.Post)
+        .where(models.Post.user_id == user_id)
+        .offset(skip)
+        .limit(limit)
+    )
+    return result.scalars().all()
+
+async def get_user_by_username(db: AsyncSession, username: str) -> Optional[models.User]:
+    result = await db.execute(
+        select(models.User).where(models.User.username == username)
+    )
+    return result.scalar_one_or_none()
+
+async def get_posts_by_username(db: AsyncSession, username: str, skip: int = 0, limit: int = 10) -> list[models.Post]:
+    user = await get_user_by_username(db, username)
+    if not user:
+        return []  # User not found, return an empty list or handle as needed
+
+    result = await db.execute(
+        select(models.Post)
+        .where(models.Post.user_id == user.user_id)
+        .offset(skip)
+        .limit(limit)
+    )
+    return result.scalars().all()
+
+#Request CRUD
+async def create_request(db: AsyncSession, request: Schemas.RequestCreate) -> models.Request
+    db_request = models.Request(**request.dict())
+    db.add(db_request)
+    db.commit()
+    db.refresh(db_animal)
+    return db_request
+
+#Request by ID
+async def getRequest(db:AsyncSession, request_id: int) -> Optional[models.Request]:
+    result = await db.execute(select(models.Request).where(models.Request.request_id == request_id))
+    return result.scalar_one_or_none()
+
+# Get all requests with optional pagination
+async def get_requests(db: AsyncSession, skip: int = 0, limit: int = 10) -> list[models.Request]:
+    result = await db.execute(select(models.Request).offset(skip).limit(limit))
+    return result.scalars().all()
+
+# Update a request
+async def update_request(db: AsyncSession, request_id: int, request: schemas.RequestCreate) -> Optional[models.Request]:
+    result = await db.execute(select(models.Request).where(models.Request.request_id == request_id))
+    db_request = result.scalar_one_or_none()
+    if db_request is None:
+        return None
+    for key, value in request.dict().items():
+        setattr(db_request, key, value)
+    await db.commit()
+    await db.refresh(db_request)
+    return db_request
+
+# Delete a request
+async def delete_request(db: AsyncSession, request_id: int) -> Optional[models.Request]:
+    result = await db.execute(select(models.Request).where(models.Request.request_id == request_id))
+    db_request = result.scalar_one_or_none()
+    if db_request is None:
+        return None
+    await db.delete(db_request)
+    await db.commit()
+    return db_request
+
+#Filter requests by user
+async def get_requests_by_user(db: AsyncSession, user_id: int, skip: int = 0, limit: int = 10) -> list[models.Request]:
+    result = await db.execute(
+        select(models.Request)
+        .where(models.Request.user_id == user_id)
+        .offset(skip)
+        .limit(limit)
+    )
+    return result.scalars().all()

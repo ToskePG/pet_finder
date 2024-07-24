@@ -61,7 +61,13 @@ class RequestBase(BaseModel):
     content: str
 
 class RequestCreate(RequestBase):
-    pass 
+    pass
+
+class RequestResponse(RequestBase)
+    request_id: int
+    user: UserResponse
+    post: PostResponse
+    content: str
 
 class Request(RequestBase):
     class Config:
