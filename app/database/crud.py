@@ -146,3 +146,13 @@ async def delete_request(db: AsyncSession, request_id: int) -> Optional[models.R
     await db.delete(db_request)
     await db.commit()
     return db_request
+
+#Filter requests by user
+async def get_requests_by_user(db: AsyncSession, user_id: int, skip: int = 0, limit: int = 10) -> list[models.Request]:
+    result = await db.execute(
+        select(models.Request)
+        .where(models.Request.user_id == user_id)
+        .offset(skip)
+        .limit(limit)
+    )
+    return result.scalars().all()
