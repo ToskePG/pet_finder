@@ -66,7 +66,7 @@ class Post(Base):
     image = Column(LargeBinary)
     created_at = Column(Date)
     request_id = Column(Integer, ForeignKey("requests.request_id"))
-    post_type_id = Column(Integer, ForeignKey("post_types.post_type_id"))
+    post_type_id = Column(Integer, ForeignKey("post_types.post_type_id"), nullable=False)
 
     user = relationship("User", back_populates="posts")
     animal = relationship("Animal")
