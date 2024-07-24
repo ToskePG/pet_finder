@@ -51,6 +51,22 @@ from sqlalchemy import update, delete
 from ..database import models
 from ..schemas import schemas
 
+#PostType CRUD
+async def create_post_type(db: AsyncSession, post_type: schemas.PostTypeCreate) -> models.PostType:
+    db_post_type = models.PostType(**post_type.dict())
+    db.add(db_post_type)
+    await db.commit()
+    await db.refresh(db_post_type)
+    return db_post_type
+
+async def get_post_type(db: AsyncSession, post_type_id: int) -> Optional[models.PostType]:
+    result = await db.execute(select(models.PostType).where(models.PostType.post_type_id == post_type_id))
+    return result.scalar_one_or_none()
+
+async def get_post_types(db: AsyncSession) -> list[models.PostType]:
+    result = await db.execute(select(models.PostType))
+    return result.scalars().all()
+
 # Create a new post
 async def create_post(db: AsyncSession, post: schemas.CreatePost) -> models.Post:
     db_post = models.Post(**post.dict())
