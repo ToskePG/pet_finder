@@ -136,7 +136,7 @@ async def get_posts_by_username(db: AsyncSession, username: str, skip: int = 0, 
     return result.scalars().all()
 
 #Request CRUD
-async def create_request(db: AsyncSession, request: Schemas.RequestCreate) -> models.Request
+async def create_request(db: AsyncSession, request: schemas.RequestCreate) -> models.Request:
     db_request = models.Request(**request.dict())
     db.add(db_request)
     db.commit()
