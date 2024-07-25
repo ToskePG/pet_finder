@@ -196,3 +196,67 @@ async def get_posts_by_email(db: AsyncSession, email: str) -> list[models.Post]:
         select(models.Post).join(models.User).where(models.User.email == email)
     )
     return result.scalars().all()
+
+# Fetching posts by username where the authenticated user has requests
+async def get_posts_by_username(db: AsyncSession, username: str, requesting_user_id: int, skip: int = 0, limit: int = 10) -> list[models.Post]:
+    user = await get_user_by_username(db, username)
+    if not user:
+        return []
+    
+    result = await db.execute(
+        select(models.Post)
+        .options(joinedload(models.Post.requests))  # Eager load requests
+        .join(models.Request, models.Post.post_id == models.Request.post_id)
+        .where(
+            models.Post.user_id == user.user_id,
+            models.Request.user_id == requesting_user_id
+        )
+        .offset(skip)
+        .limit(limit)
+    )
+    return result.scalars().all()
+
+# Fetching posts by email where the authenticated user has requests
+async def get_posts_by_email(db: AsyncSession, email: str, requesting_user_id: int, skip: int = 0, limit: int = 10) -> list[models.Post]:
+    user = await get_user_by_email(db, email)
+    if not user:
+        return []
+
+    result = await db.execute(
+        select(models.Post)
+        .options(joinedload(models.Post.requests))  # Eager load requests
+        .join(models.Request, models.Post.post_id == models.Request.post_id)
+        .where(
+            models.Post.user_id == user.user_id,
+            models.Request.user_id == requesting_user_id
+        )
+        .offset(skip)
+        .limit(limit)
+    )
+    return result.scalars().all()
+
+# Fetch posts created by the current user, where the specified username has made requests
+async def get_posts_by_user_with_requests(
+    db: AsyncSession, 
+    username: str, 
+    current_user_id: int, 
+    skip: int = 0, 
+    limit: int = 10
+) -> list[models.Post]:
+    # Get the user_id of the specified username
+    user = await get_user_by_username(db, username)
+    if not user:
+        return []
+
+    result = await db.execute(
+        select(models.Post)
+        .options(joinedload(models.Post.requests))  # Eager load requests
+        .join(models.Request, models.Post.post_id == models.Request.post_id)
+        .where(
+            models.Post.user_id == current_user_id,  # Posts by current user
+            models.Request.user_id == user.user_id  # Requests by specified username
+        )
+        .offset(skip)
+        .limit(limit)
+    )
+    return result.scalars().all()

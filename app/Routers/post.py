@@ -99,3 +99,45 @@ async def get_posts_by_email(email: str, db: AsyncSession = Depends(get_db)):
     if not posts:
         raise HTTPException(status_code=404, detail="No posts found for the given email")
     return posts
+
+# List all posts by a specific username where the current user has requests
+@router.get("/posts/user/{username}", response_model=list[schemas.PostResponse])
+async def get_posts_by_username(
+    username: str,
+    skip: int = 0,
+    limit: int = 10,
+    current_user: schemas.User = Depends(auth.get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    posts = await crud.get_posts_by_username(db, username, current_user.user_id, skip, limit)
+    if not posts:
+        raise HTTPException(status_code=404, detail="No posts found for the given username with your requests")
+    return posts
+
+# Endpoint to filter posts by email where the current user has requests
+@router.get("/posts/by_email_requests", response_model=list[schemas.PostResponse])
+async def get_posts_by_email(
+    email: str,
+    skip: int = 0,
+    limit: int = 10,
+    current_user: schemas.User = Depends(auth.get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    posts = await crud.get_posts_by_email(db, email, current_user.user_id, skip, limit)
+    if not posts:
+        raise HTTPException(status_code=404, detail="No posts found for the given email with your requests")
+    return posts
+
+# List all posts by the current user where the specified username has made requests
+@router.get("/posts/current_user_with_requests/{username}", response_model=list[schemas.PostResponse])
+async def get_posts_by_user_with_requests(
+    username: str,
+    skip: int = 0,
+    limit: int = 10,
+    current_user: schemas.User = Depends(auth.get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    posts = await crud.get_posts_by_user_with_requests(db, username, current_user.user_id, skip, limit)
+    if not posts:
+        raise HTTPException(status_code=404, detail="No posts found where the specified user has made requests")
+    return posts
