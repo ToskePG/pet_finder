@@ -1,5 +1,5 @@
-from .Routers import user
-from app.database.db import Base, engine
+from .Routers import user, animal
+from .database.db import Base, engine
 from fastapi import FastAPI
 from .database import models
 #Imports for jinja2 templates
@@ -21,3 +21,4 @@ async def read_root(request: Request):
 app.mount("/app/static", StaticFiles(directory="app/static"), name="static")
 
 app.include_router(user.router)
+app.include_router(animal.router)
