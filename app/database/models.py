@@ -1,4 +1,5 @@
-from app.database.db import Base
+
+from ..database.db import Base
 from sqlalchemy import Column, Integer, String, ForeignKey, Date, Float, Boolean, LargeBinary
 from sqlalchemy.orm import relationship
 import re
@@ -25,6 +26,12 @@ class Animal(Base):
     animal_id = Column(Integer, primary_key=True)
     animal_type = Column(String, ForeignKey("animal_types.animal_type_id"))
     animal_breed = Column(String)
+    animal_name = Column(String)
+    animal_gender = Column(String)
+    animal_age = Column(Integer)
+    animal_size = Column(String)
+    animal_coatLength = Column(String)
+    animal_color = Column(String)
     medical_card = Column(String)
     location = Column(Integer, ForeignKey("locations.location_id"))
 
@@ -48,6 +55,12 @@ class Request(Base):
     post_id = Column(Integer, ForeignKey("posts.post_id"))
     content = Column(String)
 
+class PostType(Base):
+    __tablename__ = "post_types"
+
+    post_type_id = Column(Integer, primary_key=True)
+    post_type_name = Column(String, unique=True)
+
 class Post(Base):
     __tablename__ = "posts"
 
@@ -60,3 +73,10 @@ class Post(Base):
     image = Column(LargeBinary)
     created_at = Column(Date)
     request_id = Column(Integer, ForeignKey("requests.request_id"))
+    post_type_id = Column(Integer, ForeignKey("post_types.post_type_id"), nullable=False)
+
+    user = relationship("User", back_populates="posts")
+    animal = relationship("Animal")
+    post_type = relationship("PostType")
+
+User.posts = relationship("Post", order_by=Post.post_id, back_populates="user")
