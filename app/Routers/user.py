@@ -13,23 +13,32 @@ router = APIRouter()
 
 @router.post('/register/', response_model=schemas.User)
 async def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    # Validate email
     if not models.User.validate_email(user.email):
         raise HTTPException(status_code=400, detail="Invalid email address")
     
-    db_user = crud.get_user_by_email(db=db, email=user.email)
-    if db_user:
-        raise HTTPException(status_code=400, detail = "Email already registered")
-    db_user = crud.get_user_by_username(db=db, username = user.username)
-    if db_user:
+    # Check if email is already registered
+    db_user_by_email = crud.get_user_by_email(db=db, email=user.email)
+    if db_user_by_email:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    # Check if username is already registered
+    db_user_by_username = crud.get_user_by_username(db=db, username=user.username)
+    if db_user_by_username:
         raise HTTPException(status_code=400, detail="Username already registered")
     
+    # Hash the user's password
     hashed_password = auth.get_password_hash(password=user.password)
-    user_dict = user.model_dump()
-    user_dict.pop("password")
-    db_user = models.User(**user_dict, password = hashed_password)
+    
+    # Prepare user data for saving, excluding the plain password
+    user_data = user.dict(exclude={"password"})
+    db_user = models.User(**user_data, password=hashed_password)
+    
+    # Save the new user to the database
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
+    
     return db_user
 
 @router.post('/token', response_model=schemas.Token)
