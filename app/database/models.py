@@ -13,6 +13,7 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     is_admin = Column(Boolean, default=False)
     password = Column(String)
+    animals = relationship("Animal")
 
 
     @staticmethod
@@ -34,6 +35,7 @@ class Animal(Base):
     animal_color = Column(String)
     medical_card = Column(String)
     location = Column(Integer, ForeignKey("locations.location_id"))
+    user_id = Column(Integer, ForeignKey("users.user_id"))
 
 class Location(Base):
     __tablename__ = "locations"
