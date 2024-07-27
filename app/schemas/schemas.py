@@ -5,6 +5,35 @@ from typing import Optional, List
 
 # Existing Schemas
 
+# Animal Schemas
+class AnimalBase(BaseModel):
+    animal_type: str
+    animal_breed: str
+    animal_name: str
+    animal_gender: str
+    animal_age: int
+    animal_size: str
+    animal_coatLength: str
+    animal_color: str
+    medical_card: str
+    location: int
+
+
+class AnimalCreate(AnimalBase):
+    pass 
+
+class Animal(AnimalBase):
+    animal_id: int
+    user_id: int
+    class Config:
+        orm_mode = True
+
+class AnimalResponse(AnimalBase):
+    animal_id: int
+    user_id: int
+    class Config:
+        orm_mode = True
+
 # User Schemas
 class UserBase(BaseModel):
     username: str
@@ -13,29 +42,24 @@ class UserBase(BaseModel):
     
 class UserCreate(UserBase):
     password: str
+    is_admin: bool = False
 
 class UserResponse(UserBase):
+    user_id: int
     username: str
     email: str
     is_admin: bool
+    animals: list[Animal] = []
+
+    class Config:
+        orm_mode = True
 
 class User(UserBase):
+    user_id: int
+    animals: list[Animal] = []
     class Config:
         orm_mode = True
 
-# Animal Schemas
-class AnimalBase(BaseModel):
-    animal_type: str
-    animal_breed: str
-    medical_card: str
-    location: int
-
-class AnimalCreate(AnimalBase):
-    pass 
-
-class Animal(AnimalBase):
-    class Config:
-        orm_mode = True
 
 # Location Schemas
 class LocationBase(BaseModel):
@@ -56,6 +80,14 @@ class AnimalTypeCreate(AnimalTypeBase):
     pass 
 
 class AnimalType(AnimalTypeBase):
+    animal_type_id: int
+    animal_type: str
+    class Config:
+        orm_mode = True
+
+class AnimaTypeResponse(AnimalTypeBase):
+    animal_type_id: int
+    animal_type: str
     class Config:
         orm_mode = True
 
