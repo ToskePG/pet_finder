@@ -1,4 +1,4 @@
-from app.database.db import Base
+from ..database.db import Base
 from sqlalchemy import Column, Integer, String, ForeignKey, Date, Float, Boolean, LargeBinary
 from sqlalchemy.orm import relationship
 import re
@@ -12,7 +12,7 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     is_admin = Column(Boolean, default=False)
     password = Column(String)
-
+    animals = relationship("Animal")
 
     @staticmethod
     def validate_email(email):
@@ -25,8 +25,15 @@ class Animal(Base):
     animal_id = Column(Integer, primary_key=True)
     animal_type = Column(String, ForeignKey("animal_types.animal_type_id"))
     animal_breed = Column(String)
+    animal_name = Column(String)
+    animal_gender = Column(String)
+    animal_age = Column(Integer)
+    animal_size = Column(String)
+    animal_coatLength = Column(String)
+    animal_color = Column(String)
     medical_card = Column(String)
     location = Column(Integer, ForeignKey("locations.location_id"))
+    user_id = Column(Integer, ForeignKey("users.user_id"))
 
 class Location(Base):
     __tablename__ = "locations"
