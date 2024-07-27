@@ -1,5 +1,5 @@
 from .Routers import user, animal, post, request
-from app.database.db import Base, engine
+from .database.db import Base, engine
 from fastapi import FastAPI
 from .database import models
 #Imports for jinja2 templates

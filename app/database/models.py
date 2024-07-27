@@ -12,7 +12,8 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     is_admin = Column(Boolean, default=False)
     password = Column(String)
-    animals = relationship("Animal")
+    animals = relationship("Animal", cascade = "all, delete-orphan")
+    posts = relationship('Post', cascade = "all, delete-orphan")
 
     @staticmethod
     def validate_email(email):
@@ -23,17 +24,19 @@ class Animal(Base):
     __tablename__ = 'animals'
 
     animal_id = Column(Integer, primary_key=True)
-    animal_type = Column(String, ForeignKey("animal_types.animal_type_id"))
-    animal_breed = Column(String)
-    animal_name = Column(String)
-    animal_gender = Column(String)
-    animal_age = Column(Integer)
-    animal_size = Column(String)
-    animal_coatLength = Column(String)
-    animal_color = Column(String)
+    animal_type_id = Column(Integer, ForeignKey("animal_types.animal_type_id"), nullable= False)
+    animal_breed = Column(String, nullable= False)
+    animal_name = Column(String, nullable= False)
+    animal_gender = Column(String, nullable= False)
+    animal_age = Column(Integer, nullable= False)
+    animal_size = Column(String, nullable= False)
+    animal_coatLength = Column(String, nullable= False)
+    animal_color = Column(String, nullable= False)
     medical_card = Column(String)
-    location = Column(Integer, ForeignKey("locations.location_id"))
-    user_id = Column(Integer, ForeignKey("users.user_id"))
+    location = Column(Integer, ForeignKey("locations.location_id"), nullable= False)
+    user_id = Column(Integer, ForeignKey("users.user_id"), nullable= False)
+
+    animal_type = relationship("AnimalType")
 
 class Location(Base):
     __tablename__ = "locations"
@@ -41,7 +44,7 @@ class Location(Base):
     location_id = Column(Integer, primary_key=True)
     city_name = Column(String, unique=True)
     
-class Animal_type(Base):
+class AnimalType(Base):
     __tablename__ = "animal_types"
     
     animal_type_id = Column(Integer, primary_key=True)

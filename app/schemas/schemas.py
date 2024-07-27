@@ -5,9 +5,28 @@ from typing import Optional, List
 
 # Existing Schemas
 
+# AnimalType Schemas
+class AnimalTypeBase(BaseModel):
+    animal_type: str
+
+class AnimalTypeCreate(AnimalTypeBase):
+    pass 
+
+class AnimalType(AnimalTypeBase):
+    animal_type_id: int
+    animal_type: str
+    class Config:
+        orm_mode = True
+
+class AnimaTypeResponse(AnimalTypeBase):
+    animal_type_id: int
+    animal_type: str
+    class Config:
+        orm_mode = True
+
 # Animal Schemas
 class AnimalBase(BaseModel):
-    animal_type: str
+    animal_type_id: int
     animal_breed: str
     animal_name: str
     animal_gender: str
@@ -25,12 +44,14 @@ class AnimalCreate(AnimalBase):
 class Animal(AnimalBase):
     animal_id: int
     user_id: int
+    animal_type: AnimalType #Include animal type info
     class Config:
         orm_mode = True
 
 class AnimalResponse(AnimalBase):
     animal_id: int
     user_id: int
+    animal_type: AnimalType #Include animal type info
     class Config:
         orm_mode = True
 
@@ -72,24 +93,7 @@ class Location(LocationBase):
     class Config:
         orm_mode = True
 
-# AnimalType Schemas
-class AnimalTypeBase(BaseModel):
-    animal_type: str
 
-class AnimalTypeCreate(AnimalTypeBase):
-    pass 
-
-class AnimalType(AnimalTypeBase):
-    animal_type_id: int
-    animal_type: str
-    class Config:
-        orm_mode = True
-
-class AnimaTypeResponse(AnimalTypeBase):
-    animal_type_id: int
-    animal_type: str
-    class Config:
-        orm_mode = True
 
 # PostType Schemas
 class PostTypeBase(BaseModel):
