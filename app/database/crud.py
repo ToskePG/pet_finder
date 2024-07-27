@@ -22,9 +22,7 @@ def delete_user(db: Session, user_id: int):
     db.commit()
     return db_user
 
-
 #Animals
-
 def create_animal(db: Session, animal: schemas.AnimalCreate):
 
     db_animal = models.Animal(**animal.model_dump())
@@ -116,11 +114,10 @@ async def get_posts_by_user(db: AsyncSession, user_id: int, skip: int = 0, limit
     )
     return result.scalars().all()
 
-async def get_user_by_username(db: AsyncSession, username: str) -> Optional[models.User]:
-    result = await db.execute(
-        select(models.User).where(models.User.username == username)
-    )
-    return result.scalar_one_or_none()
+async def get_user_by_username_for_token(db: AsyncSession, username: str) -> Optional[models.User]:
+    result = db.execute(select(models.User).where(models.User.username == username))
+    user = result.scalar_one_or_none()
+    return user
 
 async def get_posts_by_username(db: AsyncSession, username: str, skip: int = 0, limit: int = 10) -> list[models.Post]:
     user = await get_user_by_username(db, username)
