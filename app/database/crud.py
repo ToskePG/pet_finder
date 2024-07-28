@@ -147,12 +147,12 @@ async def getRequest(db:AsyncSession, request_id: int) -> Optional[models.Reques
 
 # Get all requests with optional pagination
 async def get_requests(db: AsyncSession, skip: int = 0, limit: int = 10) -> list[models.Request]:
-    result = await db.execute(select(models.Request).offset(skip).limit(limit))
+    result = db.execute(select(models.Request).offset(skip).limit(limit))
     return result.scalars().all()
 
 # Update a request
 async def update_request(db: AsyncSession, request_id: int, request: schemas.RequestCreate) -> Optional[models.Request]:
-    result = await db.execute(select(models.Request).where(models.Request.request_id == request_id))
+    result = db.execute(select(models.Request).where(models.Request.request_id == request_id))
     db_request = result.scalar_one_or_none()
     if db_request is None:
         return None
@@ -164,7 +164,7 @@ async def update_request(db: AsyncSession, request_id: int, request: schemas.Req
 
 # Delete a request
 async def delete_request(db: AsyncSession, request_id: int) -> Optional[models.Request]:
-    result = await db.execute(select(models.Request).where(models.Request.request_id == request_id))
+    result = db.execute(select(models.Request).where(models.Request.request_id == request_id))
     db_request = result.scalar_one_or_none()
     if db_request is None:
         return None
@@ -174,7 +174,7 @@ async def delete_request(db: AsyncSession, request_id: int) -> Optional[models.R
 
 #Filter requests by user
 async def get_requests_by_user(db: AsyncSession, user_id: int, skip: int = 0, limit: int = 10) -> list[models.Request]:
-    result = await db.execute(
+    result = db.execute(
         select(models.Request)
         .where(models.Request.user_id == user_id)
         .offset(skip)
@@ -184,12 +184,12 @@ async def get_requests_by_user(db: AsyncSession, user_id: int, skip: int = 0, li
 
 # Get posts by user_id
 async def get_posts_by_user_id(db: AsyncSession, user_id: int) -> list[models.Post]:
-    result = await db.execute(select(models.Post).where(models.Post.user_id == user_id))
+    result = db.execute(select(models.Post).where(models.Post.user_id == user_id))
     return result.scalars().all()
 
 # Get posts by email
 async def get_posts_by_email(db: AsyncSession, email: str) -> list[models.Post]:
-    result = await db.execute(
+    result = db.execute(
         select(models.Post).join(models.User).where(models.User.email == email)
     )
     return result.scalars().all()
@@ -219,7 +219,7 @@ async def get_posts_by_email(db: AsyncSession, email: str, requesting_user_id: i
     if not user:
         return []
 
-    result = await db.execute(
+    result = db.execute(
         select(models.Post)
         .options(joinedload(models.Post.requests))  # Eager load requests
         .join(models.Request, models.Post.post_id == models.Request.post_id)
@@ -245,7 +245,7 @@ async def get_posts_by_user_with_requests(
     if not user:
         return []
 
-    result = await db.execute(
+    result = db.execute(
         select(models.Post)
         .options(joinedload(models.Post.requests))  # Eager load requests
         .join(models.Request, models.Post.post_id == models.Request.post_id)

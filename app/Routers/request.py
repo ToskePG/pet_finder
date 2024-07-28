@@ -25,7 +25,7 @@ async def get_request(
     current_user: schemas.User = Depends(auth.get_current_user),  # Ensure user is authenticated
     db: AsyncSession = Depends(get_db)
 ):
-    db_request = await crud.get_request(db, request_id)
+    db_request = await crud.get_requests(db, request_id)
     if not db_request:
         raise HTTPException(status_code=404, detail="Request not found")
     return db_request
