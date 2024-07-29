@@ -4,6 +4,7 @@ from ..database import models
 from ..schemas import schemas
 from typing import Optional
 from sqlalchemy import and_
+from ..security import auth
 
 
 
@@ -14,33 +15,57 @@ from sqlalchemy import update, delete
 from ..database import models
 from ..schemas import schemas
 
-#async def get_user_by_email(db: AsyncSession, email: str):
-#    result = await db.execute(select(models.User).where(models.User.email == email))
- #   return result.scalar_one_or_none()
-    #return db.query(models.User).filter(models.User.email == email).first()
 
-async def get_user_by_id(db: AsyncSession, user_id: int):
+#GET users by ID
+async def get_user_by_id(db: AsyncSession, user_id: int) -> Optional[schemas.User]: 
     result = db.execute(select(models.User).where(models.User.user_id == user_id))
     return result.scalar_one_or_none()
 
-async def get_user_by_email(db: AsyncSession, email: str):
+
+#GET users by EMAIL
+async def get_user_by_email(db: AsyncSession, email: str) -> Optional[schemas.User]:
     result = db.execute(select(models.User).where(models.User.email == email))
     return result.scalar_one_or_none()
 
 
-async def get_user_by_username(db: AsyncSession, username: str):
+#GET users by USERNAME
+async def get_user_by_username(db: AsyncSession, username: str) -> Optional[schemas.User]:
     result = db.execute(select(models.User).where(models.User.username == username))
-    
     user = result.scalar_one_or_none()
     return user
 
 
-async def get_users(db: AsyncSession, skip: int = 0, limit: int = 10):
+#GET all USERS
+async def get_users(db: AsyncSession, skip: int = 0, limit: int = 10) -> list[schemas.User]:
     result = db.execute(select(models.User).offset(skip).limit(limit))
     return result.scalars().all()
+
+#PATCH user
+async def patch_user(db: AsyncSession, user_id: int, user_update: schemas.UserUpdate) -> Optional[schemas.User]:
+    if user_update.username:
+        db_user = await get_user_by_username(db=db, username=user_update.username)
+        if db_user:
+            return "Already exists"
+    
+    db_user = await get_user_by_id(db=db, user_id=user_id)
+    if not db_user:
+        return None
+    
+    for key, val in user_update.model_dump(exclude_unset = True).items():
+        
+        if key == "password":
+            hashed_password = auth.get_password_hash(password=user_update.password)
+            setattr(db_user, "password", hashed_password)
+        else:
+            setattr(db_user, key, val)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+    
     
 
-async def delete_user(db: AsyncSession, user_id: int):
+#DELETE users by ID
+async def delete_user(db: AsyncSession, user_id: int) -> Optional[schemas.User]:
     db_user = await get_user_by_id(db=db, user_id=user_id)
     if not db_user:
         return None
@@ -48,24 +73,30 @@ async def delete_user(db: AsyncSession, user_id: int):
     db.commit()
     return db_user
 
-#Animals
 
-async def create_animal_type(db: AsyncSession, animal_type: schemas.AnimalTypeCreate):
+#AnimalType
+
+#CREATE animalType
+async def create_animal_type(db: AsyncSession, animal_type: schemas.AnimalTypeCreate) -> schemas.AnimalType:
     db_animal_type = models.AnimalType(**animal_type.model_dump())
     db.add(db_animal_type)
     db.commit()
     db.refresh(db_animal_type)
     return db_animal_type
 
-async def get_animal_type(db: AsyncSession, animal_type_id: int):
+#GET AnimalType by ID
+async def get_animal_type(db: AsyncSession, animal_type_id: int) -> Optional[schemas.AnimalType]:
     db_animal_type = db.execute(select(models.AnimalType).where(models.AnimalType.animal_type_id == animal_type_id))
     return db_animal_type.scalar_one_or_none()
-    
-async def get_animal_types(db: AsyncSession):
-    db_animal_types = db.execute(select(models.AnimalType))
+
+
+#GET AnimalType
+async def get_animal_types(db: AsyncSession, limit: int = 0, skip: int = 0) -> list[schemas.AnimalType]:
+    db_animal_types = db.execute(select(models.AnimalType).offset(skip).limit(limit))
     return db_animal_types.scalars().all()
 
-async def delete_animal_type(animal_type_id: int, db: AsyncSession):
+#Delete AimalType by ID
+async def delete_animal_type(animal_type_id: int, db: AsyncSession) -> Optional[schemas.AnimalType]:
     db_animal_type = db.execute(select(models.AnimalType).where(models.AnimalType.animal_type_id == animal_type_id))
     db_animal_type = db_animal_type.scalar_one_or_none()
     if not db_animal_type:
@@ -75,25 +106,35 @@ async def delete_animal_type(animal_type_id: int, db: AsyncSession):
     return db_animal_type
 
 
+#Animal
 
-async def create_animal(db: AsyncSession, user_id: int, animal: schemas.AnimalCreate):
-
+#CREATE Animal
+async def create_animal(db: AsyncSession, user_id: int, animal: schemas.AnimalCreate) -> models.Animal:
     db_animal = models.Animal(**animal.model_dump(), user_id = user_id)
     db.add(db_animal)
     db.commit()
     db.refresh(db_animal)
     return db_animal
 
-async def get_animal(db: AsyncSession, animal_id: int):
+
+#GET Animal by animal_ID
+async def get_animal(db: AsyncSession, animal_id: int) -> Optional[schemas.Animal]:
     db_animal = db.execute(select(models.Animal).where(models.Animal.animal_id == animal_id))
     return db_animal.scalar_one_or_none()
-    
 
+
+#GET Animals by user_ID
+async def get_animals_by_user_id(db: AsyncSession, user_id: int) -> Optional[list[schemas.Animal]]:
+    db_animals = db.execute(select(models.Animal).where(models.Animal.user_id == user_id))
+    return db_animals.scalars().all()
+
+
+#FILTER animals
 async def get_animals(animal_type: Optional[str], animal_breed: Optional[str],
                 animal_age: Optional[int], animal_coat_length: Optional[str],
                 animal_color: Optional[str], animal_gender: Optional[str], animal_size: Optional[str],
                 animal_name: Optional[str], animal_id: Optional[int],
-                 user_id: Optional[int], db: AsyncSession):
+                 user_id: Optional[int], db: AsyncSession, skip: int = 0, limit: int = 0) -> list[schemas.Animal]:
     
     query = select(models.Animal)
 
@@ -119,10 +160,23 @@ async def get_animals(animal_type: Optional[str], animal_breed: Optional[str],
     if user_id:
         query = query.where(models.Animal.user_id == user_id)
 
+    query = query.offset(skip).limit(limit)
     result = db.execute(query)
     return result.scalars().all()
 
-async def delete_animal(db: AsyncSession, animal_id: int, user_id: int):
+
+async def patch_animal(animal_id: int, animal_update: schemas.AnimalUpdate, db: AsyncSession) -> schemas.Animal:
+    db_animal = await get_animal(animal_id=animal_id, db=db)
+
+    for key, val in animal_update.model_dump(exclude_unset = True).items():
+         setattr(db_animal, key, val)
+    db.commit()
+    db.refresh(db_animal)
+    return db_animal
+
+
+#DELETE Animal by ID
+async def delete_animal(db: AsyncSession, animal_id: int, user_id: int) -> Optional[schemas.Animal]:
     db_animal = await get_animal(db=db, animal_id=animal_id)
     if db_animal.user_id != user_id:
        return "Not authorized"
@@ -132,7 +186,36 @@ async def delete_animal(db: AsyncSession, animal_id: int, user_id: int):
     db.commit()
     return db_animal
     
+#Location
 
+#Create location
+async def create_location(location: schemas.LocationCreate, db: AsyncSession) -> schemas.LocationResponse:
+    db_location = models.Location(**location.model_dump())
+    db.add(db_location)
+    db.commit()
+    db.refresh(db_location)
+    return db_location
+
+
+#GET a location by ID
+async def get_location(location_id: int, db: AsyncSession):
+    db_location = db.execute(select(models.Location).where(models.Location.location_id == location_id))
+    return db_location.scalar_one_or_none()
+
+
+#GET all locations
+async def get_locations(db: AsyncSession, skip: int = 0, limit: int = 0) -> list[schemas.Location]:
+    db_locations = db.execute(select(models.Location).offset(skip).limit(limit))
+    return db_locations.scalars().all()
+
+#DELETE location by ID
+async def delete_location(location_id: int, db: AsyncSession) -> Optional[schemas.Location]:
+    db_location = await get_location(location_id=location_id, db=db)
+    if not db_location:
+        return None
+    db.delete(db_location)
+    db.commit()
+    return db_location
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select

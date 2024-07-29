@@ -1,4 +1,4 @@
-from .Routers import user, animal, post, request
+from .Routers import user, animal, post, request, location
 from .database.db import Base, engine
 from fastapi import FastAPI
 from .database import models
@@ -29,3 +29,4 @@ app.include_router(user.router, prefix="/api/users")
 app.include_router(animal.router, prefix="/api/animals")
 app.include_router(post.router, prefix="/api/posts")
 app.include_router(request.router, prefix="/api/requests")
+app.include_router(location.router, prefix="/api/locations")

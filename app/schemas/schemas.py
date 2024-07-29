@@ -55,6 +55,19 @@ class AnimalResponse(AnimalBase):
     class Config:
         orm_mode = True
 
+class AnimalUpdate(BaseModel):
+    animal_type_id: Optional[int] = None
+    animal_breed: Optional[str] = None
+    animal_name: Optional[str] = None
+    animal_gender: Optional[str] = None
+    animal_age: Optional[int] = None
+    animal_size: Optional[str] = None
+    animal_coatLength: Optional[str] = None
+    animal_color: Optional[str] = None
+    medical_card: Optional[str] = None
+    location: Optional[int] = None
+
+
 # User Schemas
 class UserBase(BaseModel):
     username: str
@@ -81,6 +94,10 @@ class User(UserBase):
     class Config:
         orm_mode = True
 
+class UserUpdate(BaseModel):
+    username: Optional[str] = None
+    password: Optional[str] = None
+
 
 # Location Schemas
 class LocationBase(BaseModel):
@@ -90,6 +107,10 @@ class LocationCreate(LocationBase):
     pass
 
 class Location(LocationBase):
+    class Config:
+        orm_mode = True
+
+class LocationResponse(LocationBase):
     class Config:
         orm_mode = True
 
