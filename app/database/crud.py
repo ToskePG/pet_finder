@@ -4,6 +4,11 @@ from ..database import models
 from ..schemas import schemas
 from typing import Optional
 from sqlalchemy import and_
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from sqlalchemy.orm import selectinload
+from sqlalchemy import update, delete
+from sqlalchemy import DateTime
 
 def get_user_by_email(db: Session, email: str):
     return db.query(models.User).filter(models.User.email == email).first()
@@ -42,45 +47,23 @@ def get_animals(animal_type: Optional[str], animal_breed: Optional[str], db: Ses
     
     return db.query(models.Animal)
 
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
-from sqlalchemy.orm import selectinload
-from sqlalchemy import update, delete
-from ..database import models
-from ..schemas import schemas
-
-#PostType CRUD
-async def create_post_type(db: AsyncSession, post_type: schemas.PostTypeCreate) -> models.PostType:
-    db_post_type = models.PostType(**post_type.dict())
-    db.add(db_post_type)
-    await db.commit()
-    await db.refresh(db_post_type)
-    return db_post_type
-
-async def get_post_type(db: AsyncSession, post_type_id: int) -> Optional[models.PostType]:
-    result = await db.execute(select(models.PostType).where(models.PostType.post_type_id == post_type_id))
-    return result.scalar_one_or_none()
-
-async def get_post_types(db: AsyncSession) -> list[models.PostType]:
-    result = await db.execute(select(models.PostType))
-    return result.scalars().all()
-
 # Create a new post
 async def create_post(db: AsyncSession, post: schemas.CreatePost) -> models.Post:
     db_post = models.Post(**post.dict())
+    #db_post.created_at = datetime.utcnow()  # Set the created_at datetime
     db.add(db_post)
-    await db.commit()
-    await db.refresh(db_post)
+    db.commit()
+    db.refresh(db_post)
     return db_post
 
 # Get a post by ID
 async def get_post(db: AsyncSession, post_id: int) -> models.Post:
-    result = await db.execute(select(models.Post).where(models.Post.post_id == post_id))
+    result = db.execute(select(models.Post).where(models.Post.post_id == post_id))
     return result.scalar_one_or_none()
 
 # Get all posts with optional pagination
 async def get_posts(db: AsyncSession, skip: int = 0, limit: int = 10) -> list[models.Post]:
-    result = await db.execute(select(models.Post).offset(skip).limit(limit))
+    result = db.execute(select(models.Post).offset(skip).limit(limit))
     return result.scalars().all()
 
 #Update a post

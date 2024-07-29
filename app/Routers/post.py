@@ -4,44 +4,27 @@ from ..database.db import get_db
 from ..database import crud
 from ..schemas import schemas
 from ..security import auth
+from datetime import datetime
 
 router = APIRouter()
 
-# PostType Endpoints
-
-@router.post("/post_types", response_model=schemas.PostTypeResponse)
-async def create_post_type(post_type: schemas.PostTypeCreate, db: AsyncSession = Depends(get_db)):
-    db_post_type = crud.create_post_type(db, post_type)
-    return db_post_type
-
-@router.get("/post_types/{post_type_id}", response_model=schemas.PostTypeResponse)
-async def get_post_type(post_type_id: int, db: AsyncSession = Depends(get_db)):
-    db_post_type = crud.get_post_type(db, post_type_id)
-    if not db_post_type:
-        raise HTTPException(status_code=404, detail="Post type not found")
-    return db_post_type
-
-@router.get("/post_types", response_model=list[schemas.PostTypeResponse])
-async def get_post_types(db: AsyncSession = Depends(get_db)):
-    return crud.get_post_types(db)
-
-# Existing Post Endpoints
-
+#Post Endpoints
 @router.post("/create_post", response_model=schemas.PostResponse)
 async def create_post(post: schemas.CreatePost, current_user: schemas.User = Depends(auth.get_current_user), db: AsyncSession = Depends(get_db)):
-    db_post = crud.create_post(db, post)
+    db_post = await crud.create_post(db, post)
     return db_post
 
 @router.get("/{post_id}", response_model=schemas.PostResponse)
 async def get_post(post_id: int, db: AsyncSession = Depends(get_db)):
-    db_post = crud.get_post(db, post_id)
+    db_post = await crud.get_post(db, post_id)
     if not db_post:
         raise HTTPException(status_code=404, detail="Post not found")
     return db_post
 
 @router.get("/", response_model=list[schemas.PostResponse])
 async def get_posts(skip: int = 0, limit: int = 10, db: AsyncSession = Depends(get_db)):
-    return crud.get_posts(db, skip=skip, limit=limit)
+    db_posts = await crud.get_posts(db,skip,limit)
+    return db_posts
 
 @router.put("/{post_id}", response_model=schemas.PostResponse)
 async def update_post(post_id: int, post: schemas.CreatePost, db: AsyncSession = Depends(get_db)):

@@ -2,6 +2,7 @@ from app.database.db import Base
 from sqlalchemy import Column, Integer, String, ForeignKey, Date, Float, Boolean, LargeBinary
 from sqlalchemy.orm import relationship
 import re
+from datetime import datetime
 
 
 class User(Base):
@@ -48,12 +49,6 @@ class Request(Base):
     post_id = Column(Integer, ForeignKey("posts.post_id"))
     content = Column(String)
 
-class PostType(Base):
-    __tablename__ = "post_types"
-
-    post_type_id = Column(Integer, primary_key=True)
-    post_type_name = Column(String, unique=True)
-
 class Post(Base):
     __tablename__ = "posts"
 
@@ -64,12 +59,10 @@ class Post(Base):
     abstract = Column(String)
     content = Column(String)
     image = Column(LargeBinary)
-    created_at = Column(Date)
+    #created_at = Column(datetime)
     request_id = Column(Integer, ForeignKey("requests.request_id"))
-    post_type_id = Column(Integer, ForeignKey("post_types.post_type_id"), nullable=False)
 
     user = relationship("User", back_populates="posts")
     animal = relationship("Animal")
-    post_type = relationship("PostType")
 
 User.posts = relationship("Post", order_by=Post.post_id, back_populates="user")
