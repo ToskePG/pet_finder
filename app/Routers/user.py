@@ -20,8 +20,6 @@ async def register(user: schemas.UserCreate, db: AsyncSession = Depends(get_db))
     if not models.User.validate_email(user.email):
         raise HTTPException(status_code=400, detail="Invalid email address")
     
-<<<<<<< HEAD
-=======
     db_user_by_email = await crud.get_user_by_email(db=db, email=user.email)
     if db_user_by_email:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -30,7 +28,6 @@ async def register(user: schemas.UserCreate, db: AsyncSession = Depends(get_db))
     if db_user_by_username:
         raise HTTPException(status_code=400, detail="Username already registered")
     
->>>>>>> pet_branch
     hashed_password = auth.get_password_hash(password=user.password)
     user_data = user.dict(exclude={"password"})
     db_user = models.User(**user_data, password=hashed_password)
@@ -89,12 +86,6 @@ async def read_user_by_username(username: str, current_user: schemas.User = Depe
     
 
 #List all users, its more for testing the registration endpoint, but maybe it will still be needed
-<<<<<<< HEAD
-@router.get('/all_users', response_model=list[schemas.User])
-async def read_users(skip: int=0, limit: int=0, db: Session = Depends(get_db)):
-    users = crud.get_users(db=db, skip=skip, limit=limit)
-    return users
-=======
 @router.get('/', response_model=list[schemas.User])
 async def read_users(skip: int=0, limit: int=0, db: AsyncSession = Depends(get_db)):
     users = await crud.get_users(db=db, skip=skip, limit=limit)
@@ -122,4 +113,3 @@ async def delete_user(user_id: int, current_user: schemas.User = Depends(auth.ge
     return 
 
 
->>>>>>> pet_branch
