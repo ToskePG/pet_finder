@@ -54,7 +54,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
         headers={"WWW-Authenticate": "Bearer"},
     )
     token_data = verify_access_token(token, credentials_exception)
-    user = crud.get_user_by_username(db, username=token_data.username)
+    user = await crud.get_user_by_username(db, username=token_data.username)
     if user is None:
         raise credentials_exception
     return user

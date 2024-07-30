@@ -6,6 +6,7 @@ import re
 from datetime import datetime
 
 
+
 class User(Base):
     __tablename__ = 'users'
 
@@ -14,29 +15,31 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     is_admin = Column(Boolean, default=False)
     password = Column(String)
-    animals = relationship("Animal")
-
+    pets = relationship("Pet", cascade = "all, delete-orphan")
+    posts = relationship('Post', cascade = "all, delete-orphan")
 
     @staticmethod
     def validate_email(email):
         email_regex = re.compile(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
         return re.match(email_regex, email) is not None
 
-class Animal(Base):
-    __tablename__ = 'animals'
+class Pet(Base):
+    __tablename__ = 'pets'
 
-    animal_id = Column(Integer, primary_key=True)
-    animal_type = Column(String, ForeignKey("animal_types.animal_type_id"))
-    animal_breed = Column(String)
-    animal_name = Column(String)
-    animal_gender = Column(String)
-    animal_age = Column(Integer)
-    animal_size = Column(String)
-    animal_coatLength = Column(String)
-    animal_color = Column(String)
+    pet_id = Column(Integer, primary_key=True)
+    pet_type_id = Column(Integer, ForeignKey("pet_types.pet_type_id"), nullable= False)
+    pet_breed = Column(String, nullable= False)
+    pet_name = Column(String, nullable= False)
+    pet_gender = Column(String, nullable= False)
+    pet_age = Column(Integer, nullable= False)
+    pet_size = Column(String, nullable= False)
+    pet_coatLength = Column(String, nullable= False)
+    pet_color = Column(String, nullable= False)
     medical_card = Column(String)
-    location = Column(Integer, ForeignKey("locations.location_id"))
-    user_id = Column(Integer, ForeignKey("users.user_id"))
+    location = Column(Integer, ForeignKey("locations.location_id"), nullable= False)
+    user_id = Column(Integer, ForeignKey("users.user_id"), nullable= False)
+
+    pet_type = relationship("PetType")
 
 class Location(Base):
     __tablename__ = "locations"
@@ -44,11 +47,11 @@ class Location(Base):
     location_id = Column(Integer, primary_key=True)
     city_name = Column(String, unique=True)
     
-class Animal_type(Base):
-    __tablename__ = "animal_types"
+class PetType(Base):
+    __tablename__ = "pet_types"
     
-    animal_type_id = Column(Integer, primary_key=True)
-    animal_type = Column(String, unique=True)
+    pet_type_id = Column(Integer, primary_key=True)
+    pet_type = Column(String, unique=True)
 
 class Request(Base):
     __tablename__ = "requests"
@@ -63,7 +66,7 @@ class Post(Base):
 
     post_id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.user_id"))
-    animal_id = Column(Integer, ForeignKey("animals.animal_id"))
+    pet_id = Column(Integer, ForeignKey("pets.pet_id"))
     title = Column(String)
     abstract = Column(String)
     content = Column(String)
@@ -71,6 +74,6 @@ class Post(Base):
     request_id = Column(Integer, ForeignKey("requests.request_id"))
 
     user = relationship("User", back_populates="posts")
-    animal = relationship("Animal")
+    pet = relationship("Pet")
     post_type = relationship("PostType")
 
