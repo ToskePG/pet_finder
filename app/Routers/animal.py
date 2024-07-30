@@ -13,7 +13,7 @@ router = APIRouter()
 @router.post('/create_animal', response_model=schemas.Animal)
 async def create_animal(animal: schemas.AnimalCreate, current_user: schemas.User = Depends(auth.get_current_user), db: Session = Depends(get_db)):
     animal_dict = animal.model_dump()
-    db_animal = models.Animal(**animal_dict)
+    db_animal = models.Animal(**animal_dict, user_id = current_user.user_id)
     db.add(db_animal)
     db.commit()
     db.refresh(db_animal)
@@ -26,14 +26,14 @@ async def read_animal(animal_id: int, current_user: schemas.User = Depends(auth.
         raise HTTPException(status_code=404, detail="This animal does not exist")
     return db_animal
 
-@router.get('/', response_model= list[schemas.Animal])
-async def read_all_animals(animal_type: str = None, animal_breed: str = None, current_user: schemas.User = Depends(auth.get_current_user), db: Session = Depends(get_db)):
+@router.get('/animals', response_model= list[schemas.Animal])
+async def read_all_animals(category: str = None, breed: str = None,
+                           age: int = None, coatLength: str = None, color: str = None,
+                           gender: str = None, size: str = None, name: str = None, id: int = None,
+                            current_user: schemas.User = Depends(auth.get_current_user), db: Session = Depends(get_db)):
     
-    db_animals = crud.get_animals(animal_type=animal_type, animal_breed=animal_breed, db=db)
-    return db_animals
-
-#Searching animal by species and breed
-@router.get('/{animal_type}', response_model=list[schemas.Animal])
-async def read_specific_animal_type(animal_type: str, current_user: schemas.User = Depends(auth.get_current_user), db: Session = Depends(get_db)):
-    db_animals = crud.get_animals_specific_type(animal_type=animal_type, db=db)
+    db_animals = crud.get_animals(animal_type=category, animal_breed=breed,
+                                animal_age = age, animal_coat_length = coatLength,
+                                animal_color = color, animal_gender = gender,
+                                animal_size = size, animal_name = name, animal_id = id, db=db)
     return db_animals

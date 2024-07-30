@@ -39,13 +39,33 @@ def create_animal(db: Session, animal: schemas.AnimalCreate):
 def get_animal(db: Session, animal_id: int):
     return db.query(models.Animal).filter(models.Animal.animal_id == animal_id).first()
 
-def get_animals(animal_type: Optional[str], animal_breed: Optional[str], db: Session):
-    if animal_type and animal_breed:
-        return db.query(models.Animal).filter(and_(models.Animal.animal_type == animal_type, models.Animal.animal_breed == animal_breed)).all()
-    if animal_type:
-        return db.query(models.Animal).filter(models.Animal.animal_type == animal_type).all()
+def get_animals(animal_type: Optional[str], animal_breed: Optional[str],
+                animal_age: Optional[int], animal_coat_length: Optional[str],
+                animal_color: Optional[str], animal_gender: Optional[str], animal_size: Optional[str],
+                animal_name: Optional[str], animal_id: Optional[int], db: Session):
     
-    return db.query(models.Animal)
+    query = db.query(models.Animal)
+
+    if animal_type:
+        query = query.filter(models.Animal.animal_type == animal_type)
+    if animal_breed:
+        query = query.filter(models.Animal.animal_breed == animal_breed)
+    if animal_age is not None:
+        query = query.filter(models.Animal.animal_age == animal_age)
+    if animal_coat_length:
+        query = query.filter(models.Animal.animal_coatLength == animal_coat_length)
+    if animal_color:
+        query = query.filter(models.Animal.animal_color == animal_color)
+    if animal_gender:
+        query = query.filter(models.Animal.animal_gender == animal_gender)
+    if animal_size:
+        query = query.filter(models.Animal.animal_size == animal_size)
+    if animal_name:
+        query = query.filter(models.Animal.animal_name == animal_name)
+    if animal_id is not None:
+        query = query.filter(models.Animal.animal_id == animal_id)
+
+    return query.all()
 
 # Create a new post
 async def create_post(db: AsyncSession, post: schemas.CreatePost) -> models.Post:
@@ -240,3 +260,11 @@ async def get_posts_by_user_with_requests(
         .limit(limit)
     )
     return result.scalars().all()
+def delete_animal(db: Session, animal_id: int):
+    db_animal = get_animal(db=db, animal_id=animal_id)
+    if not db_animal:
+        return None
+    db.delete(db_animal)
+    db.commit()
+    return db_animal
+    
