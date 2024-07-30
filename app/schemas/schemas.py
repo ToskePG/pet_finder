@@ -2,38 +2,6 @@ from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional, List
 
-# Animal Schemas
-class AnimalBase(BaseModel):
-    animal_type: str
-    animal_breed: str
-    animal_name: str
-    animal_gender: str
-    animal_age: int
-    animal_size: str
-    animal_coatLength: str
-    animal_color: str
-    medical_card: str
-    location: int
-    
-
-class AnimalCreate(AnimalBase):
-    pass 
-
-class Animal(AnimalBase):
-    animal_id: int
-    user_id: int
-    class Config:
-        orm_mode = True
-
-class AnimalResponse(AnimalBase):
-    animal_id: int
-    user_id: int
-    class Config:
-        orm_mode = True
-
-<<<<<<< HEAD
-=======
-# Existing Schemas
 # PetType Schemas
 class PetTypeBase(BaseModel):
     pet_type: str
@@ -96,7 +64,6 @@ class PetUpdate(BaseModel):
     medical_card: Optional[str] = None
     location: Optional[int] = None
 
->>>>>>> pet_branch
 
 # User Schemas
 class UserBase(BaseModel):
@@ -113,18 +80,6 @@ class UserResponse(UserBase):
     username: str
     email: str
     is_admin: bool
-<<<<<<< HEAD
-    animals: list[Animal] = []
-
-    class Config:
-        orm_mode = True
-
-class User(UserBase):
-    user_id: int
-    animals: list[Animal] = []
-    class Config:
-        orm_mode = True
-=======
     pets: list[Pet] = []
 
     class Config:
@@ -140,7 +95,6 @@ class UserUpdate(BaseModel):
     username: Optional[str] = None
     password: Optional[str] = None
 
->>>>>>> pet_branch
 
 # Location Schemas
 class LocationBase(BaseModel):

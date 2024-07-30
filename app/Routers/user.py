@@ -110,6 +110,4 @@ async def delete_user(user_id: int, current_user: schemas.User = Depends(auth.ge
     db_user = await crud.delete_user(user_id=user_id, db=db)
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
-    return 
-
-
+    return
