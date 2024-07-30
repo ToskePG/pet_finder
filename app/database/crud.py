@@ -74,117 +74,121 @@ async def delete_user(db: AsyncSession, user_id: int) -> Optional[schemas.User]:
     return db_user
 
 
-#AnimalType
+#PetType
 
-#CREATE animalType
-async def create_animal_type(db: AsyncSession, animal_type: schemas.AnimalTypeCreate) -> schemas.AnimalType:
-    db_animal_type = models.AnimalType(**animal_type.model_dump())
-    db.add(db_animal_type)
+#CREATE PetType
+async def create_pet_type(db: AsyncSession, pet_type: schemas.PetTypeCreate) -> schemas.PetType:
+    db_pet_type = models.PetType(**pet_type.model_dump())
+    db.add(db_pet_type)
     db.commit()
-    db.refresh(db_animal_type)
-    return db_animal_type
+    db.refresh(db_pet_type)
+    return db_pet_type
 
-#GET AnimalType by ID
-async def get_animal_type(db: AsyncSession, animal_type_id: int) -> Optional[schemas.AnimalType]:
-    db_animal_type = db.execute(select(models.AnimalType).where(models.AnimalType.animal_type_id == animal_type_id))
-    return db_animal_type.scalar_one_or_none()
+#GET PetType by ID
+async def get_pet_type(db: AsyncSession, pet_type_id: int) -> Optional[schemas.PetType]:
+    db_pet_type = db.execute(select(models.PetType).where(models.PetType.pet_type_id == pet_type_id))
+    return db_pet_type.scalar_one_or_none()
 
 
-#GET AnimalType
-async def get_animal_types(db: AsyncSession, limit: int = 0, skip: int = 0) -> list[schemas.AnimalType]:
-    db_animal_types = db.execute(select(models.AnimalType).offset(skip).limit(limit))
-    return db_animal_types.scalars().all()
+#GET PetType
+async def get_pet_types(db: AsyncSession, limit: int = 0, skip: int = 10) -> list[schemas.PetType]:
+    db_pet_types = db.execute(select(models.PetType).offset(skip).limit(limit))
+    return db_pet_types.scalars().all()
 
-#Delete AimalType by ID
-async def delete_animal_type(animal_type_id: int, db: AsyncSession) -> Optional[schemas.AnimalType]:
-    db_animal_type = db.execute(select(models.AnimalType).where(models.AnimalType.animal_type_id == animal_type_id))
-    db_animal_type = db_animal_type.scalar_one_or_none()
-    if not db_animal_type:
+#Delete PetType by ID
+async def delete_pet_type(pet_type_id: int, db: AsyncSession) -> Optional[schemas.PetType]:
+    db_pet_type = db.execute(select(models.PetType).where(models.PetType.pet_type_id == pet_type_id))
+    db_pet_type = db_pet_type.scalar_one_or_none()
+    if not db_pet_type:
         return None
-    db.delete(db_animal_type)
+    db.delete(db_pet_type)
     db.commit()
-    return db_animal_type
+    return db_pet_type
 
 
-#Animal
 
-#CREATE Animal
-async def create_animal(db: AsyncSession, user_id: int, animal: schemas.AnimalCreate) -> models.Animal:
-    db_animal = models.Animal(**animal.model_dump(), user_id = user_id)
-    db.add(db_animal)
+
+#CREATE Pet
+async def create_pet(db: AsyncSession, user_id: int, pet: schemas.PetCreate) -> models.Pet:
+    db_pet = models.Pet(**pet.model_dump(), user_id = user_id)
+    db.add(db_pet)
     db.commit()
-    db.refresh(db_animal)
-    return db_animal
+    db.refresh(db_pet)
+    return db_pet
 
 
-#GET Animal by animal_ID
-async def get_animal(db: AsyncSession, animal_id: int) -> Optional[schemas.Animal]:
-    db_animal = db.execute(select(models.Animal).where(models.Animal.animal_id == animal_id))
-    return db_animal.scalar_one_or_none()
+#GET Pet by pet_ID
+async def get_pet(db: AsyncSession, pet_id: int) -> Optional[schemas.Pet]:
+    db_pet = db.execute(select(models.Pet).where(models.Pet.pet_id == pet_id))
+    return db_pet.scalar_one_or_none()
 
 
-#GET Animals by user_ID
-async def get_animals_by_user_id(db: AsyncSession, user_id: int) -> Optional[list[schemas.Animal]]:
-    db_animals = db.execute(select(models.Animal).where(models.Animal.user_id == user_id))
-    return db_animals.scalars().all()
+#GET Pet by user_ID
+async def get_pets_by_user_id(db: AsyncSession, user_id: int) -> Optional[list[schemas.Pet]]:
+    db_pets = db.execute(select(models.Pet).where(models.Pet.user_id == user_id))
+    return db_pets.scalars().all()
 
 
-#FILTER animals
-async def get_animals(animal_type: Optional[str], animal_breed: Optional[str],
-                animal_age: Optional[int], animal_coat_length: Optional[str],
-                animal_color: Optional[str], animal_gender: Optional[str], animal_size: Optional[str],
-                animal_name: Optional[str], animal_id: Optional[int],
-                 user_id: Optional[int], db: AsyncSession, skip: int = 0, limit: int = 0) -> list[schemas.Animal]:
+#FILTER pets
+async def get_pets(pet_type: Optional[str], pet_breed: Optional[str],
+                pet_age: Optional[int], pet_coat_length: Optional[str],
+                pet_color: Optional[str], pet_gender: Optional[str], pet_size: Optional[str],
+                pet_name: Optional[str], pet_id: Optional[int],
+                 user_id: Optional[int], pet_location: Optional[str], db: AsyncSession, skip: int = 0, limit: int = 10) -> list[schemas.Pet]:
     
-    query = select(models.Animal)
+    query = select(models.Pet)
 
-    if animal_type:
-        query = query.join(models.AnimalType).where(models.AnimalType.animal_type == animal_type)
-        #query = query.where(models.Animal.animal_type.animal_type == animal_type)
-    if animal_breed:
-        query = query.where(models.Animal.animal_breed == animal_breed)
-    if animal_age is not None:
-        query = query.where(models.Animal.animal_age == animal_age)
-    if animal_coat_length:
-        query = query.where(models.Animal.animal_coatLength == animal_coat_length)
-    if animal_color:
-        query = query.where(models.Animal.animal_color == animal_color)
-    if animal_gender:
-        query = query.where(models.Animal.animal_gender == animal_gender)
-    if animal_size:
-        query = query.where(models.Animal.animal_size == animal_size)
-    if animal_name:
-        query = query.where(models.Animal.animal_name == animal_name)
-    if animal_id is not None:
-        query = query.where(models.Animal.animal_id == animal_id)
+    if pet_type:
+        query = query.join(models.PetType).where(models.PetType.pet_type == pet_type)
+        
+    if pet_breed:
+        query = query.where(models.Pet.pet_breed == pet_breed)
+    if pet_age is not None:
+        query = query.where(models.Pet.pet_age == pet_age)
+    if pet_coat_length:
+        query = query.where(models.Pet.pet_coatLength == pet_coat_length)
+    if pet_color:
+        query = query.where(models.Pet.pet_color == pet_color)
+    if pet_gender:
+        query = query.where(models.Pet.pet_gender == pet_gender)
+    if pet_size:
+        query = query.where(models.Pet.pet_size == pet_size)
+    if pet_name:
+        query = query.where(models.Pet.pet_name == pet_name)
+    if pet_id is not None:
+        query = query.where(models.Pet.pet_id == pet_id)
     if user_id:
-        query = query.where(models.Animal.user_id == user_id)
+        query = query.where(models.Pet.user_id == user_id)
+    
+    if pet_location:
+        query = query.join(models.Location).where(models.Location.city_name == pet_location)
 
     query = query.offset(skip).limit(limit)
     result = db.execute(query)
     return result.scalars().all()
 
 
-async def patch_animal(animal_id: int, animal_update: schemas.AnimalUpdate, db: AsyncSession) -> schemas.Animal:
-    db_animal = await get_animal(animal_id=animal_id, db=db)
+async def patch_pet(pet_id: int, pet_update: schemas.PetUpdate, db: AsyncSession) -> schemas.Pet:
+    db_pet = await get_pet(pet_id=pet_id, db=db)
 
-    for key, val in animal_update.model_dump(exclude_unset = True).items():
-         setattr(db_animal, key, val)
+    for key, val in pet_update.model_dump(exclude_unset = True).items():
+         setattr(db_pet, key, val)
     db.commit()
-    db.refresh(db_animal)
-    return db_animal
+    db.refresh(db_pet)
+    return db_pet
 
-
-#DELETE Animal by ID
-async def delete_animal(db: AsyncSession, animal_id: int, user_id: int) -> Optional[schemas.Animal]:
-    db_animal = await get_animal(db=db, animal_id=animal_id)
-    if db_animal.user_id != user_id:
+#DELETE Pet by ID
+async def delete_pet(db: AsyncSession, pet_id: int, user_id: int) -> Optional[schemas.Pet]:
+    db_pet = await get_pet(db=db, pet_id=pet_id)
+    if db_pet.user_id != user_id:
        return "Not authorized"
-    if not db_animal:
+    if not db_pet:
         return None
-    db.delete(db_animal)
+    db.delete(db_pet)
     db.commit()
-    return db_animal
+    return db_pet
+
+
     
 #Location
 
@@ -204,7 +208,7 @@ async def get_location(location_id: int, db: AsyncSession):
 
 
 #GET all locations
-async def get_locations(db: AsyncSession, skip: int = 0, limit: int = 0) -> list[schemas.Location]:
+async def get_locations(db: AsyncSession, skip: int = 0, limit: int = 10) -> list[schemas.Location]:
     db_locations = db.execute(select(models.Location).offset(skip).limit(limit))
     return db_locations.scalars().all()
 
