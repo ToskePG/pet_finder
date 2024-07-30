@@ -4,66 +4,65 @@ from typing import Optional, List
 
 
 # Existing Schemas
+# PetType Schemas
+class PetTypeBase(BaseModel):
+    pet_type: str
 
-# AnimalType Schemas
-class AnimalTypeBase(BaseModel):
-    animal_type: str
-
-class AnimalTypeCreate(AnimalTypeBase):
+class PetTypeCreate(PetTypeBase):
     pass 
 
-class AnimalType(AnimalTypeBase):
-    animal_type_id: int
-    animal_type: str
+class PetType(PetTypeBase):
+    pet_type_id: int
+    pet_type: str
     class Config:
         orm_mode = True
 
-class AnimaTypeResponse(AnimalTypeBase):
-    animal_type_id: int
-    animal_type: str
+class PetTypeResponse(PetTypeBase):
+    pet_type_id: int
+    pet_type: str
     class Config:
         orm_mode = True
 
-# Animal Schemas
-class AnimalBase(BaseModel):
-    animal_type_id: int
-    animal_breed: str
-    animal_name: str
-    animal_gender: str
-    animal_age: int
-    animal_size: str
-    animal_coatLength: str
-    animal_color: str
+# Pet Schemas
+class PetBase(BaseModel):
+    pet_type_id: int
+    pet_breed: str
+    pet_name: str
+    pet_gender: str
+    pet_age: int
+    pet_size: str
+    pet_coatLength: str
+    pet_color: str
     medical_card: str
     location: int
 
 
-class AnimalCreate(AnimalBase):
+class PetCreate(PetBase):
     pass 
 
-class Animal(AnimalBase):
-    animal_id: int
+class Pet(PetBase):
+    pet_id: int
     user_id: int
-    animal_type: AnimalType #Include animal type info
+    pet_type: PetType #Include pet type info
     class Config:
         orm_mode = True
 
-class AnimalResponse(AnimalBase):
-    animal_id: int
+class PetResponse(PetBase):
+    pet_id: int
     user_id: int
-    animal_type: AnimalType #Include animal type info
+    pet_type: PetType #Include pet type info
     class Config:
         orm_mode = True
 
-class AnimalUpdate(BaseModel):
-    animal_type_id: Optional[int] = None
-    animal_breed: Optional[str] = None
-    animal_name: Optional[str] = None
-    animal_gender: Optional[str] = None
-    animal_age: Optional[int] = None
-    animal_size: Optional[str] = None
-    animal_coatLength: Optional[str] = None
-    animal_color: Optional[str] = None
+class PetUpdate(BaseModel):
+    pet_type_id: Optional[int] = None
+    pet_breed: Optional[str] = None
+    pet_name: Optional[str] = None
+    pet_gender: Optional[str] = None
+    pet_age: Optional[int] = None
+    pet_size: Optional[str] = None
+    pet_coatLength: Optional[str] = None
+    pet_color: Optional[str] = None
     medical_card: Optional[str] = None
     location: Optional[int] = None
 
@@ -83,14 +82,14 @@ class UserResponse(UserBase):
     username: str
     email: str
     is_admin: bool
-    animals: list[Animal] = []
+    pets: list[Pet] = []
 
     class Config:
         orm_mode = True
 
 class User(UserBase):
     user_id: int
-    animals: list[Animal] = []
+    pets: list[Pet] = []
     class Config:
         orm_mode = True
 
@@ -140,7 +139,7 @@ class PostTypeResponse(BaseModel):
 # Post Schemas
 class PostBase(BaseModel):
     user_id: int
-    animal_id: int
+    pet_id: int
     title: str
     abstract: str
     content: str
@@ -160,7 +159,7 @@ class Post(PostBase):
 class PostResponse(BaseModel):
     post_id: int
     user_id: int
-    animal_id: int
+    pet_id: int
     title: str
     abstract: str
     content: str
