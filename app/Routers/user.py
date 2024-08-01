@@ -60,7 +60,7 @@ async def get_me(current_user: schemas.User = Depends(auth.get_current_user)):
     return current_user
 
 
-@router.get('/user_id/{user_id}', response_model=schemas.UserResponse)
+@router.get('/{user_id}', response_model=schemas.UserResponse)
 async def read_user_by_id(user_id: int, current_user: schemas.User = Depends(auth.get_current_user), db: AsyncSession = Depends(get_db)):
     db_user = await crud.get_user_by_id(user_id=user_id, db=db)
     if not db_user:
@@ -68,7 +68,7 @@ async def read_user_by_id(user_id: int, current_user: schemas.User = Depends(aut
     return db_user
 
 
-@router.get('/email/{email}', response_model=schemas.UserResponse)
+@router.get('/{email}', response_model=schemas.UserResponse)
 async def read_user_by_email(user_email: str, current_user: schemas.User = Depends(auth.get_current_user), db: AsyncSession = Depends(get_db)):
     db_user = await crud.get_user_by_email(email=user_email, db=db)
     if not db_user:
@@ -77,7 +77,7 @@ async def read_user_by_email(user_email: str, current_user: schemas.User = Depen
     return db_user
 
 
-@router.get('/username/{username}', response_model=schemas.UserResponse)
+@router.get('/{username}', response_model=schemas.UserResponse)
 async def read_user_by_username(username: str, current_user: schemas.User = Depends(auth.get_current_user), db: AsyncSession = Depends(get_db)):
     db_user = await crud.get_user_by_username(username=username, db=db)
     if not db_user:
