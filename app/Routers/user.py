@@ -24,7 +24,7 @@ async def register(user: schemas.UserCreate, db: AsyncSession = Depends(get_db))
     if db_user_by_email:
         raise HTTPException(status_code=400, detail="Email already registered")
     
-    db_user_by_username = await crud.get_user_by_username(db=db, username = user.username)
+    db_user_by_username = await crud.get_user_by_username(db=db, username=user.username)
     if db_user_by_username:
         raise HTTPException(status_code=400, detail="Username already registered")
     
@@ -37,6 +37,18 @@ async def register(user: schemas.UserCreate, db: AsyncSession = Depends(get_db))
     db.refresh(db_user)
     
     logging.info(f"User registered successfully: {db_user.username}")
+    return db_user
+
+@router.patch('/{user_id}/admin', response_model=schemas.UserResponse, tags=["User"])
+async def assign_admin_role(user_id: int, current_user: schemas.User = Depends(auth.get_current_admin_user), db: AsyncSession = Depends(get_db)):
+    db_user = await crud.get_user_by_id(user_id=user_id, db=db)
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    db_user.is_admin = True
+    db.commit()
+    db.refresh(db_user)
+    
     return db_user
 
 @router.post('/token', response_model=schemas.Token, tags=["User"])
