@@ -14,6 +14,7 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     is_admin = Column(Boolean, default=False)
     password = Column(String)
+    is_confirmed = Column(Boolean, default=False)
     pets = relationship("Pet", cascade = "all, delete-orphan")
     posts = relationship('Post', cascade = "all, delete-orphan")
 

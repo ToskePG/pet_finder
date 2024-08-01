@@ -69,6 +69,7 @@ class PetUpdate(BaseModel):
 class UserBase(BaseModel):
     username: str
     email: str
+    is_confirmed: bool
     is_admin: bool
     
 class UserCreate(UserBase):
@@ -79,6 +80,7 @@ class UserResponse(UserBase):
     username: str
     email: str
     is_admin: bool
+    is_confirmed: bool
     pets: list[Pet] = []
 
     class Config:

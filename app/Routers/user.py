@@ -10,6 +10,11 @@ from datetime import timedelta
 from datetime import datetime
 import logging
 from sqlalchemy.ext.asyncio import AsyncSession
+from ..utils.email_utils import send_email  # Import the send_email function
+from ..utils.token_utils import create_confirmation_token  # Import the token creation function
+import logging
+import jwt
+from ..security.auth import SECRET_KEY, ALGORITHM
 
 router = APIRouter()
 
@@ -35,9 +40,38 @@ async def register(user: schemas.UserCreate, db: AsyncSession = Depends(get_db))
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
+
+    # Send confirmation email
+    token = create_confirmation_token(user.email)
+    confirm_url = f"http://your-domain.com/confirm-email?token={token}"
+    send_email(
+        to_email=user.email,
+        subject="Email Confirmation",
+        body=f"Please click the following link to confirm your email: {confirm_url}"
+    )
     
     logging.info(f"User registered successfully: {db_user.username}")
     return db_user
+
+@router.get('/confirm-email/', tags=["User"])
+async def confirm_email(token: str, db: AsyncSession = Depends(get_db)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email = payload.get("sub")
+        if email is None:
+            raise HTTPException(status_code=400, detail="Invalid token")
+    except jwt.PyJWTError:
+        raise HTTPException(status_code=400, detail="Invalid token")
+    
+    db_user = await crud.get_user_by_email(db=db, email=email)
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    db_user.is_confirmed = True
+    db.commit()
+    db.refresh(db_user)
+    
+    return {"message": "Email confirmed successfully"}
 
 @router.patch('/{user_id}/admin', response_model=schemas.UserResponse, tags=["User"])
 async def assign_admin_role(user_id: int, current_user: schemas.User = Depends(auth.get_current_admin_user), db: AsyncSession = Depends(get_db)):
