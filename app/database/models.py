@@ -53,14 +53,6 @@ class PetType(Base):
     pet_type_id = Column(Integer, primary_key=True)
     pet_type = Column(String, unique=True)
 
-class Request(Base):
-    __tablename__ = "requests"
-
-    request_id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("users.user_id"))
-    post_id = Column(Integer, ForeignKey("posts.post_id"))
-    content = Column(String)
-
 class Post(Base):
     __tablename__ = "posts"
 
@@ -71,9 +63,6 @@ class Post(Base):
     abstract = Column(String)
     content = Column(String)
     image = Column(LargeBinary)
-    request_id = Column(Integer, ForeignKey("requests.request_id"))
 
     user = relationship("User", back_populates="posts")
     pet = relationship("Pet")
-    post_type = relationship("PostType")
-
