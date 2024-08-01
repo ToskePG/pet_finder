@@ -10,7 +10,7 @@ from datetime import timedelta
 from datetime import datetime
 import logging
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..utils.email_utils import send_email
+from ..utils import email_utils
 from ..utils.token_utils import create_confirmation_token
 import logging
 import jwt
@@ -44,7 +44,7 @@ async def register(user: schemas.UserCreate, db: AsyncSession = Depends(get_db))
     confirmation_link = f"http://localhost:8000/confirm-email/?token={token}"
     email_body = f"Please confirm your email by clicking the following link: {confirmation_link}"
     
-    send_email(to_email=user.email, subject="Email Confirmation", body=email_body)
+    mail_utils.send_email(to_email=user.email, subject="Email Confirmation", body=email_body)
     
     return db_user
 
