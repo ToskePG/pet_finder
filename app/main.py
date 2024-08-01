@@ -30,4 +30,4 @@ async def favicon():
 app.include_router(user.router, prefix="/api/users")
 app.include_router(pet.router, prefix="/api/pets")
 app.include_router(post.router, prefix="/api/posts")
-app.include_router(post.router, prefix="/api/location")
+app.include_router(location.router, prefix="/api/location")
