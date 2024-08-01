@@ -10,8 +10,8 @@ from datetime import timedelta
 from datetime import datetime
 import logging
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..utils.email_utils import send_email  # Import the send_email function
-from ..utils.token_utils import create_confirmation_token  # Import the token creation function
+from ..utils import email_utils
+from ..utils.token_utils import create_confirmation_token
 import logging
 import jwt
 from ..security.auth import SECRET_KEY, ALGORITHM
@@ -44,7 +44,7 @@ async def register(user: schemas.UserCreate, db: AsyncSession = Depends(get_db))
     # Send confirmation email
     token = create_confirmation_token(user.email)
     confirm_url = f"http://your-domain.com/confirm-email?token={token}"
-    send_email(
+    email_utils.send_email(
         to_email=user.email,
         subject="Email Confirmation",
         body=f"Please click the following link to confirm your email: {confirm_url}"
