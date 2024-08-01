@@ -1,5 +1,5 @@
 from app.database.db import Base, engine
-from .Routers import user, animal, post, request, location, pet
+from .Routers import user, post, request, location, pet
 from .database.db import Base, engine
 from fastapi import FastAPI
 from .database import models
@@ -27,7 +27,6 @@ async def favicon():
     return RedirectResponse(url='app/static/favicon.png')
 
 app.include_router(user.router, prefix="/api/users")
-app.include_router(animal.router, prefix="/api/animals")
 app.include_router(pet.router, prefix="/api/pets")
 app.include_router(post.router, prefix="/api/posts")
 app.include_router(request.router, prefix="/api/requests")
