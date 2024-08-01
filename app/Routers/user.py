@@ -118,7 +118,6 @@ async def update_user(user_id: int, user_update: schemas.UserUpdate, current_use
 
 @router.delete('/{user_id}/', status_code=status.HTTP_204_NO_CONTENT, tags=["User"])
 async def delete_user(user_id: int, current_user: schemas.User = Depends(auth.get_current_admin_user), db: AsyncSession = Depends(get_db)):
-    
     db_user = await crud.delete_user(user_id=user_id, db=db)
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
