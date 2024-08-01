@@ -30,5 +30,4 @@ async def delete_location(location_id: int, current_user: schemas.User = Depends
     db_location = await crud.delete_location(location_id= location_id, db=db)
     if not db_location:
         raise HTTPException(status_code=404, detail="This location does not exist")
-    return 
-
+    return
