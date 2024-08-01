@@ -138,7 +138,6 @@ class PostResponse(BaseModel):
     abstract: str
     content: str
     image: Optional[bytes]
-    created_at: datetime
 
     class Config:
         orm_mode = True
