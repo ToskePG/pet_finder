@@ -9,24 +9,24 @@ from datetime import datetime
 router = APIRouter()
 
 #Post Endpoints
-@router.post("/create_post", response_model=schemas.PostResponse)
+@router.post("/create_post", response_model=schemas.PostResponse, tags=["Post"])
 async def create_post(post: schemas.CreatePost, current_user: schemas.User = Depends(auth.get_current_user), db: AsyncSession = Depends(get_db)):
     db_post = await crud.create_post(db, post)
     return db_post
 
-@router.get("/{post_id}", response_model=schemas.PostResponse)
+@router.get("/{post_id}", response_model=schemas.PostResponse, tags=["Post"])
 async def get_post(post_id: int, db: AsyncSession = Depends(get_db)):
     db_post = await crud.get_post(db, post_id)
     if not db_post:
         raise HTTPException(status_code=404, detail="Post not found")
     return db_post
 
-@router.get("/", response_model=list[schemas.PostResponse])
+@router.get("/", response_model=list[schemas.PostResponse], tags=["Post"])
 async def get_posts(skip: int = 0, limit: int = 10, db: AsyncSession = Depends(get_db)):
     db_posts = await crud.get_posts(db,skip,limit)
     return db_posts
 
-@router.put("/{post_id}", response_model=schemas.PostResponse)
+@router.put("/{post_id}", response_model=schemas.PostResponse, tags=["Post"])
 async def update_post(post_id: int, post: schemas.CreatePost, db: AsyncSession = Depends(get_db)):
     db_post = crud.get_post(db, post_id)
     if not db_post:
@@ -34,7 +34,7 @@ async def update_post(post_id: int, post: schemas.CreatePost, db: AsyncSession =
     db_post = crud.update_post(db, post_id, post)
     return db_post
 
-@router.delete("/{post_id}", response_model=schemas.PostResponse)
+@router.delete("/{post_id}", response_model=schemas.PostResponse, tags=["Post"])
 async def delete_post(post_id: int, db: AsyncSession = Depends(get_db)):
     db_post = crud.get_post(db, post_id)
     if not db_post:
@@ -43,7 +43,7 @@ async def delete_post(post_id: int, db: AsyncSession = Depends(get_db)):
     return db_post
 
 # List all posts by the current user
-@router.get("/user", response_model=list[schemas.PostResponse])
+@router.get("/user", response_model=list[schemas.PostResponse], tags=["Post"])
 async def get_posts_by_user(
     skip: int = 0,
     limit: int = 10,
@@ -55,7 +55,7 @@ async def get_posts_by_user(
     return posts
 
 # List all posts by a specific username
-@router.get("/{username}", response_model=list[schemas.PostResponse])
+@router.get("/{username}", response_model=list[schemas.PostResponse], tags=["Post"])
 async def get_posts_by_username(
     username: str,
     skip: int = 0,
@@ -68,7 +68,7 @@ async def get_posts_by_username(
     return posts
 
 # Endpoint to filter posts by user_id
-@router.get("/by_user_id", response_model=list[schemas.PostResponse])
+@router.get("/by_user_id", response_model=list[schemas.PostResponse], tags=["Post"])
 async def get_posts_by_user_id(user_id: int, db: AsyncSession = Depends(get_db)):
     posts = crud.get_posts_by_user_id(db, user_id)
     if not posts:
@@ -76,7 +76,7 @@ async def get_posts_by_user_id(user_id: int, db: AsyncSession = Depends(get_db))
     return posts
 
 # Endpoint to filter posts by email
-@router.get("/by_email", response_model=list[schemas.PostResponse])
+@router.get("/by_email", response_model=list[schemas.PostResponse], tags=["Post"])
 async def get_posts_by_email(email: str, db: AsyncSession = Depends(get_db)):
     posts = crud.get_posts_by_email(db, email)
     if not posts:
@@ -84,7 +84,7 @@ async def get_posts_by_email(email: str, db: AsyncSession = Depends(get_db)):
     return posts
 
 # List all posts by a specific username where the current user has requests
-@router.get("/user/{username}", response_model=list[schemas.PostResponse])
+@router.get("/user/{username}", response_model=list[schemas.PostResponse], tags=["Post"])
 async def get_posts_by_username(
     username: str,
     skip: int = 0,
@@ -98,7 +98,7 @@ async def get_posts_by_username(
     return posts
 
 # Endpoint to filter posts by email where the current user has requests
-@router.get("/by_email_requests", response_model=list[schemas.PostResponse])
+@router.get("/by_email_requests", response_model=list[schemas.PostResponse], tags=["Post"])
 async def get_posts_by_email(
     email: str,
     skip: int = 0,
@@ -112,7 +112,7 @@ async def get_posts_by_email(
     return posts
 
 # List all posts by the current user where the specified username has made requests
-@router.get("/current_user_with_requests/{username}", response_model=list[schemas.PostResponse])
+@router.get("/current_user_with_requests/{username}", response_model=list[schemas.PostResponse], tags=["Post"])
 async def get_posts_by_user_with_requests(
     username: str,
     skip: int = 0,
