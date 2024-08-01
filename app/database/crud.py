@@ -241,7 +241,6 @@ async def delete_location(location_id: int, db: AsyncSession) -> Optional[schema
 # Create a new post
 async def create_post(db: AsyncSession, post: schemas.CreatePost) -> models.Post:
     db_post = models.Post(**post.dict())
-    #db_post.created_at = datetime.utcnow()  # Set the created_at datetime
     db.add(db_post)
     db.commit()
     db.refresh(db_post)

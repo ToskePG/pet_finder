@@ -10,7 +10,7 @@ from datetime import timedelta
 from datetime import datetime
 import logging
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..utils import email_utils
+from ..utils.email_utils import send_email
 from ..utils.token_utils import create_confirmation_token
 import logging
 import jwt
@@ -18,10 +18,8 @@ from ..security.auth import SECRET_KEY, ALGORITHM
 
 router = APIRouter()
 
-@router.post('/register/', response_model=schemas.User, tags=["User"])
+@router.post('/register/', response_model=schemas.UserResponse, tags=["User"])
 async def register(user: schemas.UserCreate, db: AsyncSession = Depends(get_db)):
-    logging.info("Starting registration process")
-
     if not models.User.validate_email(user.email):
         raise HTTPException(status_code=400, detail="Invalid email address")
     
@@ -35,27 +33,25 @@ async def register(user: schemas.UserCreate, db: AsyncSession = Depends(get_db))
     
     hashed_password = auth.get_password_hash(password=user.password)
     user_data = user.dict(exclude={"password"})
-    db_user = models.User(**user_data, password=hashed_password)
+    db_user = models.User(**user_data, password=hashed_password, is_confirmed=False)  # Set is_confirmed to False
     
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
-
-    # Send confirmation email
-    token = create_confirmation_token(user.email)
-    confirm_url = f"http://your-domain.com/confirm-email?token={token}"
-    email_utils.send_email(
-        to_email=user.email,
-        subject="Email Confirmation",
-        body=f"Please click the following link to confirm your email: {confirm_url}"
-    )
     
-    logging.info(f"User registered successfully: {db_user.username}")
+    # Generate email confirmation token
+    token = auth.create_confirmation_token(email=user.email)
+    confirmation_link = f"http://localhost:8000/confirm-email/?token={token}"
+    email_body = f"Please confirm your email by clicking the following link: {confirmation_link}"
+    
+    send_email(to_email=user.email, subject="Email Confirmation", body=email_body)
+    
     return db_user
 
 @router.get('/confirm-email/', tags=["User"])
 async def confirm_email(token: str, db: AsyncSession = Depends(get_db)):
     try:
+        # Decode the token to get the email address
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         email = payload.get("sub")
         if email is None:
@@ -63,10 +59,16 @@ async def confirm_email(token: str, db: AsyncSession = Depends(get_db)):
     except jwt.PyJWTError:
         raise HTTPException(status_code=400, detail="Invalid token")
     
+    # Retrieve the user by email
     db_user = await crud.get_user_by_email(db=db, email=email)
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
     
+    # Check if the user is already confirmed
+    if db_user.is_confirmed:
+        return {"message": "Email already confirmed"}
+    
+    # Update the user to set is_confirmed to True
     db_user.is_confirmed = True
     db.commit()
     db.refresh(db_user)
