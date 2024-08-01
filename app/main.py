@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from .database import models
 #Imports for jinja2 templates
 from fastapi.responses import HTMLResponse
+from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from starlette.requests import Request
