@@ -5,7 +5,7 @@ from email.mime.multipart import MIMEMultipart
 def send_email(to_email, subject, body):
     smtp_server = 'smtp.gmail.com'
     smtp_port = 587
-    smtp_username = 'satorru.gojo.1708@gmail.com'
+    smtp_username = 'petfindermne@gmail.com'
     smtp_password = 'Adrenalin123'
 
     msg = MIMEText(body)
