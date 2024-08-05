@@ -69,7 +69,6 @@ class PetUpdate(BaseModel):
 class UserBase(BaseModel):
     username: str
     email: str
-    is_admin: bool
     
 class UserCreate(UserBase):
     password: str
@@ -87,6 +86,7 @@ class UserResponse(UserBase):
 
 class User(UserBase):
     user_id: int
+    is_admin: bool
     pets: list[Pet] = []
     class Config:
         orm_mode = True
@@ -94,6 +94,7 @@ class User(UserBase):
 class UserUpdate(BaseModel):
     username: Optional[str] = None
     password: Optional[str] = None
+    is_admin: Optional[bool] = None
 
 
 # Location Schemas
