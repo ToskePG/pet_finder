@@ -3,10 +3,10 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 def send_email(to_email, subject, body):
-    smtp_server = 'smtp.gmail.com'
+    smtp_server = 'smtp.office365.com'
     smtp_port = 587
-    smtp_username = 'petfindermne@gmail.com'
-    smtp_password = 'Adrenalin123'
+    smtp_username = 'golubt@live.com'
+    smtp_password = '179698'
 
     msg = MIMEText(body)
     msg['Subject'] = subject
