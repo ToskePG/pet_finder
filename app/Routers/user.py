@@ -15,6 +15,7 @@ from ..utils.token_utils import create_confirmation_token
 import logging
 import jwt
 from ..security.auth import SECRET_KEY, ALGORITHM
+from ..utils import token_utils
 
 router = APIRouter()
 
@@ -40,11 +41,11 @@ async def register(user: schemas.UserCreate, db: AsyncSession = Depends(get_db))
     db.refresh(db_user)
     
     # Generate email confirmation token
-    token = auth.create_confirmation_token(email=user.email)
+    token = token_utils.create_confirmation_token(email=user.email)
     confirmation_link = f"http://localhost:8000/confirm-email/?token={token}"
     email_body = f"Please confirm your email by clicking the following link: {confirmation_link}"
     
-    mail_utils.send_email(to_email=user.email, subject="Email Confirmation", body=email_body)
+    email_utils.send_email(to_email=user.email, subject="Email Confirmation", body=email_body)
     
     return db_user
 
