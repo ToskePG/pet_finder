@@ -34,21 +34,20 @@ class PetBase(BaseModel):
     medical_card: str
     location: int
 
-
 class PetCreate(PetBase):
     pass 
 
 class Pet(PetBase):
     pet_id: int
     user_id: int
-    pet_type: PetType #Include pet type info
+    pet_type: PetType  # Include pet type info
     class Config:
         orm_mode = True
 
 class PetResponse(PetBase):
     pet_id: int
     user_id: int
-    pet_type: PetType #Include pet type info
+    pet_type: PetType  # Include pet type info
     class Config:
         orm_mode = True
 
@@ -64,7 +63,6 @@ class PetUpdate(BaseModel):
     medical_card: Optional[str] = None
     location: Optional[int] = None
 
-
 # User Schemas
 class UserBase(BaseModel):
     username: str
@@ -78,7 +76,7 @@ class UserResponse(UserBase):
     username: str
     email: str
     is_admin: bool
-    is_confirmed: bool
+    is_confirmed: bool  # Include is_confirmed
     pets: list[Pet] = []
 
     class Config:
@@ -87,6 +85,7 @@ class UserResponse(UserBase):
 class User(UserBase):
     user_id: int
     is_admin: bool
+    is_confirmed: bool  # Include is_confirmed
     pets: list[Pet] = []
     class Config:
         orm_mode = True
@@ -95,7 +94,6 @@ class UserUpdate(BaseModel):
     username: Optional[str] = None
     password: Optional[str] = None
     is_admin: Optional[bool] = None
-
 
 # Location Schemas
 class LocationBase(BaseModel):
@@ -112,10 +110,23 @@ class LocationResponse(LocationBase):
     class Config:
         orm_mode = True
 
+# PostType Schemas
+class PostTypeBase(BaseModel):
+    type_name: str
+
+class PostTypeCreate(PostTypeBase):
+    pass
+
+class PostType(PostTypeBase):
+    post_type_id: int
+    class Config:
+        orm_mode = True
+
 # Post Schemas
 class PostBase(BaseModel):
     user_id: int
     pet_id: int
+    post_type: Optional[PostType]  # Include post_type in PostBase
     title: str
     abstract: str
     content: str
@@ -126,7 +137,6 @@ class CreatePost(PostBase):
 
 class Post(PostBase):
     created_at: datetime
-
     class Config:
         orm_mode = True
 
@@ -135,6 +145,7 @@ class PostResponse(BaseModel):
     post_id: int
     user_id: int
     pet_id: int
+    post_type: Optional[PostType]  # Include post_type in PostResponse
     title: str
     abstract: str
     content: str
