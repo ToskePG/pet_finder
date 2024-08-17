@@ -42,7 +42,7 @@ async def register(user: schemas.UserCreate, db: AsyncSession = Depends(get_db))
     
     # Generate email confirmation token
     token = token_utils.create_confirmation_token(email=user.email)
-    confirmation_link = f"https://33d6-31-204-223-118.ngrok-free.app/api/users/confirm-email/?token={token}"
+    confirmation_link = f"https://0591-109-228-77-160.ngrok-free.app/api/users/confirm-email/?token={token}"
     email_body = f"Please confirm your email by clicking the following link: {confirmation_link}"
     
     email_utils.send_email(to_email=user.email, subject="Email Confirmation", body=email_body)
