@@ -13,13 +13,13 @@ class PetType(PetTypeBase):
     pet_type_id: int
     pet_type: str
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class PetTypeResponse(PetTypeBase):
     pet_type_id: int
     pet_type: str
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Pet Schemas
 class PetBase(BaseModel):
@@ -42,14 +42,14 @@ class Pet(PetBase):
     user_id: int
     pet_type: PetType  # Include pet type info
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class PetResponse(PetBase):
     pet_id: int
     user_id: int
     pet_type: PetType  # Include pet type info
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class PetUpdate(BaseModel):
     pet_type_id: Optional[int] = None
@@ -80,7 +80,7 @@ class UserResponse(UserBase):
     pets: list[Pet] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class User(UserBase):
     user_id: int
@@ -88,7 +88,7 @@ class User(UserBase):
     is_confirmed: bool  # Include is_confirmed
     pets: list[Pet] = []
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class UserUpdate(BaseModel):
     username: Optional[str] = None
@@ -104,11 +104,11 @@ class LocationCreate(LocationBase):
 
 class Location(LocationBase):
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class LocationResponse(LocationBase):
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # PostType Schemas
 class PostTypeBase(BaseModel):
@@ -120,7 +120,7 @@ class PostTypeCreate(PostTypeBase):
 class PostType(PostTypeBase):
     post_type_id: int
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Post Schemas
 class PostBase(BaseModel):
@@ -138,7 +138,7 @@ class CreatePost(PostBase):
 class Post(PostBase):
     created_at: datetime
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # PostResponse Schema
 class PostResponse(BaseModel):
@@ -152,7 +152,7 @@ class PostResponse(BaseModel):
     image: Optional[bytes]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Token Schemas
 class Token(BaseModel):
