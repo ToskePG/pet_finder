@@ -10,13 +10,17 @@ from datetime import timedelta
 from datetime import datetime
 import logging
 from sqlalchemy.ext.asyncio import AsyncSession
+from ..utils import email_utils
+from ..utils.token_utils import create_confirmation_token
+import logging
+import jwt
+from ..security.auth import SECRET_KEY, ALGORITHM
+from ..utils import token_utils
 
 router = APIRouter()
 
-@router.post('/register/', response_model=schemas.User, tags=["User"])
+@router.post('/register/', response_model=schemas.UserResponse, tags=["User"])
 async def register(user: schemas.UserCreate, db: AsyncSession = Depends(get_db)):
-    logging.info("Starting registration process")
-
     if not models.User.validate_email(user.email):
         raise HTTPException(status_code=400, detail="Invalid email address")
     
@@ -24,19 +28,64 @@ async def register(user: schemas.UserCreate, db: AsyncSession = Depends(get_db))
     if db_user_by_email:
         raise HTTPException(status_code=400, detail="Email already registered")
     
-    db_user_by_username = await crud.get_user_by_username(db=db, username = user.username)
+    db_user_by_username = await crud.get_user_by_username(db=db, username=user.username)
     if db_user_by_username:
         raise HTTPException(status_code=400, detail="Username already registered")
     
     hashed_password = auth.get_password_hash(password=user.password)
     user_data = user.dict(exclude={"password"})
-    db_user = models.User(**user_data, password=hashed_password)
+    db_user = models.User(**user_data, password=hashed_password, is_confirmed=False)  # Set is_confirmed to False
     
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
     
-    logging.info(f"User registered successfully: {db_user.username}")
+    # Generate email confirmation token
+    token = token_utils.create_confirmation_token(email=user.email)
+    confirmation_link = f"https://0591-109-228-77-160.ngrok-free.app/api/users/confirm-email/?token={token}"
+    email_body = f"Please confirm your email by clicking the following link: {confirmation_link}"
+    
+    email_utils.send_email(to_email=user.email, subject="Email Confirmation", body=email_body)
+    
+    return db_user
+
+@router.get('/confirm-email/', tags=["User"])
+async def confirm_email(token: str, db: AsyncSession = Depends(get_db)):
+    try:
+        # Decode the token to get the email address
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email = payload.get("sub")
+        if email is None:
+            raise HTTPException(status_code=400, detail="Invalid token")
+    except jwt.PyJWTError:
+        raise HTTPException(status_code=400, detail="Invalid token")
+    
+    # Retrieve the user by email
+    db_user = await crud.get_user_by_email(db=db, email=email)
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Check if the user is already confirmed
+    if db_user.is_confirmed:
+        return {"message": "Email already confirmed"}
+    
+    # Update the user to set is_confirmed to True
+    db_user.is_confirmed = True
+    db.commit()
+    db.refresh(db_user)
+    
+    return {"message": "Email confirmed successfully"}
+
+@router.patch('/{user_id}/admin', response_model=schemas.UserResponse, tags=["User"])
+async def assign_admin_role(user_id: int, current_user: schemas.User = Depends(auth.get_current_admin_user), db: AsyncSession = Depends(get_db)):
+    db_user = await crud.get_user_by_id(user_id=user_id, db=db)
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    db_user.is_admin = True
+    db.commit()
+    db.refresh(db_user)
+    
     return db_user
 
 @router.post('/token', response_model=schemas.Token, tags=["User"])
@@ -106,7 +155,6 @@ async def update_user(user_id: int, user_update: schemas.UserUpdate, current_use
 
 @router.delete('/{user_id}/', status_code=status.HTTP_204_NO_CONTENT, tags=["User"])
 async def delete_user(user_id: int, current_user: schemas.User = Depends(auth.get_current_admin_user), db: AsyncSession = Depends(get_db)):
-    
     db_user = await crud.delete_user(user_id=user_id, db=db)
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")

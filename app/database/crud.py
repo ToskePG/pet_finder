@@ -57,8 +57,6 @@ async def patch_user(db: AsyncSession, user_id: int, user_update: schemas.UserUp
     db.commit()
     db.refresh(db_user)
     return db_user
-    
-    
 
 #DELETE users by ID
 async def delete_user(db: AsyncSession, user_id: int) -> Optional[schemas.User]:
@@ -68,9 +66,6 @@ async def delete_user(db: AsyncSession, user_id: int) -> Optional[schemas.User]:
     db.delete(db_user)
     db.commit()
     return db_user
-
-
-#PetType
 
 #CREATE PetType
 async def create_pet_type(db: AsyncSession, pet_type: schemas.PetTypeCreate) -> schemas.PetType:
@@ -241,7 +236,6 @@ async def delete_location(location_id: int, db: AsyncSession) -> Optional[schema
 # Create a new post
 async def create_post(db: AsyncSession, post: schemas.CreatePost) -> models.Post:
     db_post = models.Post(**post.dict())
-    #db_post.created_at = datetime.utcnow()  # Set the created_at datetime
     db.add(db_post)
     db.commit()
     db.refresh(db_post)

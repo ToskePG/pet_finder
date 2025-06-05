@@ -13,13 +13,13 @@ class PetType(PetTypeBase):
     pet_type_id: int
     pet_type: str
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class PetTypeResponse(PetTypeBase):
     pet_type_id: int
     pet_type: str
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Pet Schemas
 class PetBase(BaseModel):
@@ -34,23 +34,22 @@ class PetBase(BaseModel):
     medical_card: str
     location: int
 
-
 class PetCreate(PetBase):
     pass 
 
 class Pet(PetBase):
     pet_id: int
     user_id: int
-    pet_type: PetType #Include pet type info
+    pet_type: PetType  # Include pet type info
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class PetResponse(PetBase):
     pet_id: int
     user_id: int
-    pet_type: PetType #Include pet type info
+    pet_type: PetType  # Include pet type info
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class PetUpdate(BaseModel):
     pet_type_id: Optional[int] = None
@@ -64,37 +63,37 @@ class PetUpdate(BaseModel):
     medical_card: Optional[str] = None
     location: Optional[int] = None
 
-
 # User Schemas
 class UserBase(BaseModel):
     username: str
     email: str
-    is_admin: bool
     
 class UserCreate(UserBase):
     password: str
-    is_admin: bool = False
 
 class UserResponse(UserBase):
     user_id: int
     username: str
     email: str
     is_admin: bool
+    is_confirmed: bool  # Include is_confirmed
     pets: list[Pet] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class User(UserBase):
     user_id: int
+    is_admin: bool
+    is_confirmed: bool  # Include is_confirmed
     pets: list[Pet] = []
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class UserUpdate(BaseModel):
     username: Optional[str] = None
     password: Optional[str] = None
-
+    is_admin: Optional[bool] = None
 
 # Location Schemas
 class LocationBase(BaseModel):
@@ -105,16 +104,29 @@ class LocationCreate(LocationBase):
 
 class Location(LocationBase):
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class LocationResponse(LocationBase):
     class Config:
-        orm_mode = True
+        from_attributes = True
+
+# PostType Schemas
+class PostTypeBase(BaseModel):
+    type_name: str
+
+class PostTypeCreate(PostTypeBase):
+    pass
+
+class PostType(PostTypeBase):
+    post_type_id: int
+    class Config:
+        from_attributes = True
 
 # Post Schemas
 class PostBase(BaseModel):
     user_id: int
     pet_id: int
+    post_type: Optional[PostType]  # Include post_type in PostBase
     title: str
     abstract: str
     content: str
@@ -125,22 +137,22 @@ class CreatePost(PostBase):
 
 class Post(PostBase):
     created_at: datetime
-
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # PostResponse Schema
 class PostResponse(BaseModel):
     post_id: int
     user_id: int
     pet_id: int
+    post_type: Optional[PostType]  # Include post_type in PostResponse
     title: str
     abstract: str
     content: str
     image: Optional[bytes]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Token Schemas
 class Token(BaseModel):

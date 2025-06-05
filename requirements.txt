@@ -6,3 +6,4 @@ alembic
 jinja2
 pyjwt
 python-jose
+smtplib

@@ -3,6 +3,7 @@ from .Routers import user, post, location, pet
 from .database.db import Base, engine
 from fastapi import FastAPI
 from .database import models
+from fastapi.middleware.cors import CORSMiddleware  # Import CORSMiddleware
 #Imports for jinja2 templates
 from fastapi.responses import HTMLResponse
 from fastapi.responses import RedirectResponse
@@ -12,6 +13,22 @@ from starlette.requests import Request
 
 models.Base.metadata.create_all(bind=engine)
 app =FastAPI()
+
+# Setup CORS
+origins = [
+    "http://localhost",        # Frontend on the same machine, different port
+    "http://localhost:3000",   # Common port for React
+    "http://yourfrontend.com", # Your actual frontend domain
+    # Add more origins as needed
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # Allows only specified origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all HTTP methods (GET, POST, PUT, DELETE, etc.)
+    allow_headers=["*"],  # Allows all headers
+)
 
 templates = Jinja2Templates(directory="app/templates")
 
